@@ -4,7 +4,7 @@ import { config } from "../config/config.js";
 
 
 //function to send the token response
-async function sendTokenResponse(user , res){
+async function sendTokenResponse(user , res , message){
     const token = jwt.sign({id:user._id },
         config.jwt_secret,{expiresIn:"7d"}
     );
@@ -49,6 +49,11 @@ export const register=async (req , res)=>{
             role:isSeller?"seller":"buyer",
             
         })
+        res.status(201).json({
+            message:"User registered successfully",
+            success:true,
+            user
+        })
 
 
 
@@ -56,5 +61,24 @@ export const register=async (req , res)=>{
     catch(error){
         console.log(error);
         return res.status(500).json({message:"Internal server error"});
+    }
+}
+
+export const login=async (req , res)=>{
+    const {email , password}=req.body;
+    try{
+        const user=await userModel.findOne({email});
+        if(!user){
+            return res.status(404).json({message:"User not found"});
+        }
+        const isPasswordValid=await user.comparePassword(password);
+        if(!isPasswordValid){
+            return res.status(401).json({message:"Invalid password"});
+        }
+        await sendTokenResponse(user,res , "User logged in successfully");
+    }
+    catch(error){
+        console.log(error);
+        return res.status(500).json({message:`${error.message}`});
     }
 }

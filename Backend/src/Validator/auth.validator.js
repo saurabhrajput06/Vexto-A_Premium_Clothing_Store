@@ -37,3 +37,14 @@ export const validateRegister=[
 //handle the validation errors
    validateRequest
 ]   
+
+export const validateLogin=[
+    body("email")
+    .isEmail().withMessage("Invalid email"),
+    
+    body("password")
+    .isLength({min:6})
+    .withMessage("Password must be at least 6 characters long"),
+    
+    validateRequest
+]
