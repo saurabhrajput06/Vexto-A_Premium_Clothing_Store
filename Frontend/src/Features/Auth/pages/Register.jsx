@@ -166,7 +166,13 @@ const Register = () => {
                 <span className="block text-[#e5e2e1] font-medium tracking-wide">Register as Seller</span>
                 <span className="block text-xs text-[#d0c6ab]/70 mt-1">Check this if you plan to sell products.</span>
               </div>
+
+             
             </div>
+            <a href="/api/auth/google" className="w-full bg-gradient-to-r from-[#ffd700] to-[#e9c400] text-[#3a3000] rounded-full py-4 px-8 font-bold text-sm tracking-[0.15em] uppercase hover:shadow-[0_0_24px_rgba(255,215,0,0.3)] transition-all mt-8">
+             Continue with Google
+            </a>
+
 
             {/* Submit Button */}
             <button

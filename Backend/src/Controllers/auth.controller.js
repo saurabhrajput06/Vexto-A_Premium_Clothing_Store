@@ -39,6 +39,7 @@ export const register=async (req , res)=>{
             ]
         })
         if(ExistingUser){
+            console.log("User already exists");
             return res.status(400).json({message:"User already exists"});
         }
         const user=await userModel.create({
@@ -49,10 +50,11 @@ export const register=async (req , res)=>{
             role:isSeller?"seller":"buyer",
             
         })
+        console.log("User registered successfully");
         res.status(201).json({
             message:"User registered successfully",
             success:true,
-            user
+            
         })
 
 
@@ -69,10 +71,12 @@ export const login=async (req , res)=>{
     try{
         const user=await userModel.findOne({email});
         if(!user){
+            console.log("User not found");
             return res.status(404).json({message:"User not found"});
         }
         const isPasswordValid=await user.comparePassword(password);
         if(!isPasswordValid){
+            console.log("Invalid password");
             return res.status(401).json({message:"Invalid password"});
         }
         await sendTokenResponse(user,res , "User logged in successfully");
@@ -81,4 +85,10 @@ export const login=async (req , res)=>{
         console.log(error);
         return res.status(500).json({message:`${error.message}`});
     }
+}
+
+export const googleCallback=async(req, res)=>{
+    console.log(req.user)
+
+    res.redirect("/");
 }
