@@ -2,6 +2,7 @@ import cookieParser from "cookie-parser";
 import express from "express";
 import morgan from "morgan";
 import authRoutes from "./Routes/auth.routes.js";
+import productRoutes from "./Routes/product.routes.js";
 import cors from "cors";
 
 //GoogleAuthentication
@@ -44,7 +45,10 @@ passport.use(new GoogleStrategy({
 app.get("/", (req, res) => {
     res.send("Hello World!");
 })
+
+//Routes
 app.use("/api/auth",authRoutes);
+app.use("/api/products",productRoutes);
 
 
 
