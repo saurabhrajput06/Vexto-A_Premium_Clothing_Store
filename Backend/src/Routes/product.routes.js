@@ -2,7 +2,8 @@ import express from "express";
 import { AuthenticateSeller } from "../Middleware/auth.middleware.js";
 import multer from "multer";
 import { createProductValidator } from "../Validator/product.validator.js";
-import { createProduct } from "../Controllers/product.controller.js";
+import { createProduct, getSellerProducts } from "../Controllers/product.controller.js";
+
 
 const upload = multer({ storage: multer.memoryStorage(),
     limits:{
@@ -11,6 +12,20 @@ const upload = multer({ storage: multer.memoryStorage(),
  });
 
 const router = express.Router();
-router.post("/",AuthenticateSeller,createProductValidator, upload .array("images",7),createProduct    )
+/**
+ * @router POST/api/Products
+ * @descrption Create a new Product
+ * @access Private {Seller only}
+ */
+router.post("/", AuthenticateSeller, upload.array("images",7), createProductValidator, createProduct)
+
+/**
+ * @route Get/api/products/selller
+ * @description Get all Products
+ * @access Public (seller only)
+ */
+
+router.get("/seller", AuthenticateSeller,getSellerProducts)
+
 
 export default router;  
