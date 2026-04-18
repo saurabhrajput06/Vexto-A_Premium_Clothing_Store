@@ -1,8 +1,9 @@
 import { Router } from "express";
 import { validateRegister, validateLogin } from "../Validator/auth.validator.js";
-import { register, login, googleCallback } from "../Controllers/auth.controller.js";
+import { register, login, googleCallback, getMe, logout } from "../Controllers/auth.controller.js";
 import passport from "passport";
 import { config } from "../config/config.js";
+import { AuthenticateUser } from "../Middleware/auth.middleware.js";
 
 const router = Router();
 
@@ -15,5 +16,9 @@ router.get("/google", passport.authenticate("google", { scope: ["profile", "emai
 router.get("/google/callback", passport.authenticate("google", { failureRedirect: config.NODE_ENV === "development" ? "http://localhost:5173/login" : "/login", 
     session: false 
 }), googleCallback)
+
+router.get("/me" , AuthenticateUser , getMe)
+
+router.get("/logout", logout)
 
 export default router;

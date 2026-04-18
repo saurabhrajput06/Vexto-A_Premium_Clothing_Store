@@ -31,3 +31,32 @@ catch(error){
     return res.status(401).json({message:"Unauthorized"})
 }
 }
+
+
+export const AuthenticateUser = async (req , res , next)=>{
+const token = req.cookies.token
+if(!token){
+    return res.status(401).json({message:"Unauthorized"})
+}
+//verify token
+try{
+
+    const decodedToken= jwt.verify(token,config.jwt_secret)
+   
+    const user = await userModel.findById(decodedToken.id)
+    
+    if(!user){
+        return res.status(401).json({message:"Unauthorized"})
+    }
+
+ 
+
+    //attach user to request
+    req.user = user
+    //call next middleware
+    next()
+}
+catch(error){
+    return res.status(401).json({message:"Unauthorized"})
+}
+}

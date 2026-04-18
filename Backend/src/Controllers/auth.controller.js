@@ -121,3 +121,26 @@ res.cookie("token",token)
 
     res.redirect("http://localhost:5173/");
 }
+
+export const getMe = async (req , res)=>{
+    const user = req.user;
+    res.status(200).json({
+        message:"User fetched successfully",
+        success:true , 
+        user:{
+            id:user._id,
+            email:user.email,
+            fullname:user.fullname,
+            contact:user.contact,
+            role:user.role
+        }
+    })
+}
+
+export const logout = async (req, res) => {
+    res.clearCookie("token");
+    res.status(200).json({
+        message: "User logged out successfully",
+        success: true
+    });
+};
