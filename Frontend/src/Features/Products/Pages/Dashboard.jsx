@@ -19,7 +19,7 @@ const GridIcon = () => (
 );
 
 const ImageIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" className="w-10 h-10" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
+  <svg xmlns="http://www.w3.org/2000/svg" className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
     <path strokeLinecap="round" strokeLinejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
   </svg>
 );
@@ -41,6 +41,7 @@ const ChevronRightIcon = () => (
 /* ------------------------------------------------------------------ */
 const ProductCard = ({ product }) => {
   const [imgIdx, setImgIdx] = useState(0);
+  const [hovered, setHovered] = useState(false);
   const images = product.images || [];
   const hasMultiple = images.length > 1;
 
@@ -57,149 +58,78 @@ const ProductCard = ({ product }) => {
   const amount = product.price?.amount;
   const formatted =
     amount != null
-      ? new Intl.NumberFormat("en-IN", { style: "currency", currency }).format(amount)
+      ? new Intl.NumberFormat("en-IN", { style: "currency", currency, maximumFractionDigits: 0 }).format(amount)
       : "—";
 
   return (
     <div
-      style={{
-        background: "linear-gradient(160deg, #1a1a18 0%, #111110 100%)",
-        border: "1px solid rgba(77,71,50,0.3)",
-        borderRadius: "20px",
-        overflow: "hidden",
-        transition: "transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease",
-        cursor: "pointer",
-      }}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.transform = "translateY(-4px)";
-        e.currentTarget.style.boxShadow = "0 20px 48px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,215,0,0.15)";
-        e.currentTarget.style.borderColor = "rgba(255,215,0,0.25)";
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.transform = "translateY(0)";
-        e.currentTarget.style.boxShadow = "none";
-        e.currentTarget.style.borderColor = "rgba(77,71,50,0.3)";
-      }}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      className="group flex flex-col bg-white border border-neutral-200 rounded-sm overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-1 cursor-pointer"
     >
       {/* Image Area */}
-      <div style={{ position: "relative", aspectRatio: "4/3", background: "#0e0e0e", overflow: "hidden" }}>
+      <div className="relative aspect-[4/3] bg-neutral-100 overflow-hidden">
         {images.length > 0 ? (
           <img
             src={images[imgIdx]?.url}
             alt={product.title}
-            style={{
-              width: "100%",
-              height: "100%",
-              objectFit: "cover",
-              transition: "opacity 0.3s ease",
-            }}
+            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
           />
         ) : (
-          <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", color: "#4d4732" }}>
+          <div className="w-full h-full flex items-center justify-center text-neutral-300">
             <ImageIcon />
           </div>
         )}
 
         {/* Carousel controls */}
         {hasMultiple && (
-          <>
+          <div className={`absolute inset-0 flex items-center justify-between px-2 transition-opacity duration-300 ${hovered ? 'opacity-100' : 'opacity-0'}`}>
             <button
               onClick={prev}
-              style={{
-                position: "absolute", left: "8px", top: "50%", transform: "translateY(-50%)",
-                background: "rgba(19,19,19,0.75)", border: "none", borderRadius: "50%",
-                width: "30px", height: "30px", display: "flex", alignItems: "center", justifyContent: "center",
-                color: "#d0c6ab", cursor: "pointer", backdropFilter: "blur(4px)",
-                transition: "background 0.2s, color 0.2s",
-              }}
-              onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(255,215,0,0.15)"; e.currentTarget.style.color = "#ffd700"; }}
-              onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(19,19,19,0.75)"; e.currentTarget.style.color = "#d0c6ab"; }}
+              className="p-2 bg-white/90 hover:bg-white text-neutral-900 rounded-full shadow-sm transition-colors"
             >
               <ChevronLeftIcon />
             </button>
             <button
               onClick={next}
-              style={{
-                position: "absolute", right: "8px", top: "50%", transform: "translateY(-50%)",
-                background: "rgba(19,19,19,0.75)", border: "none", borderRadius: "50%",
-                width: "30px", height: "30px", display: "flex", alignItems: "center", justifyContent: "center",
-                color: "#d0c6ab", cursor: "pointer", backdropFilter: "blur(4px)",
-                transition: "background 0.2s, color 0.2s",
-              }}
-              onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(255,215,0,0.15)"; e.currentTarget.style.color = "#ffd700"; }}
-              onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(19,19,19,0.75)"; e.currentTarget.style.color = "#d0c6ab"; }}
+              className="p-2 bg-white/90 hover:bg-white text-neutral-900 rounded-full shadow-sm transition-colors"
             >
               <ChevronRightIcon />
             </button>
-
-            {/* Dot indicators */}
-            <div style={{ position: "absolute", bottom: "10px", left: "50%", transform: "translateX(-50%)", display: "flex", gap: "5px" }}>
-              {images.map((_, i) => (
-                <span
-                  key={i}
-                  onClick={(e) => { e.stopPropagation(); setImgIdx(i); }}
-                  style={{
-                    width: i === imgIdx ? "18px" : "6px",
-                    height: "6px",
-                    borderRadius: "3px",
-                    background: i === imgIdx ? "#ffd700" : "rgba(255,255,255,0.35)",
-                    transition: "all 0.25s ease",
-                    cursor: "pointer",
-                  }}
-                />
-              ))}
-            </div>
-          </>
+          </div>
         )}
 
         {/* Image count badge */}
         {images.length > 0 && (
-          <span style={{
-            position: "absolute", top: "10px", right: "10px",
-            background: "rgba(19,19,19,0.8)", backdropFilter: "blur(4px)",
-            color: "#d0c6ab", fontSize: "11px", fontWeight: 600,
-            padding: "3px 8px", borderRadius: "20px", letterSpacing: "0.05em",
-          }}>
+          <span className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm text-neutral-900 text-xs font-bold px-2 py-1 rounded-sm uppercase tracking-widest shadow-sm">
             {imgIdx + 1}/{images.length}
           </span>
         )}
       </div>
 
       {/* Card Info */}
-      <div style={{ padding: "18px 20px 20px" }}>
-        <h3 style={{
-          margin: 0, fontSize: "17px", fontWeight: 700,
-          color: "#e5e2e1", fontFamily: "Manrope, sans-serif",
-          letterSpacing: "-0.01em", whiteSpace: "nowrap",
-          overflow: "hidden", textOverflow: "ellipsis",
-        }}>
-          {product.title}
-        </h3>
+      <div className="p-5 flex flex-col gap-3">
+        <div className="flex justify-between items-start gap-3">
+          <h3 className="text-base font-semibold text-neutral-900 truncate">
+            {product.title}
+          </h3>
+          <span className="text-base font-bold text-neutral-900 shrink-0">
+            {formatted}
+          </span>
+        </div>
 
         {product.description && (
-          <p style={{
-            margin: "8px 0 0", fontSize: "13px", color: "#6b6658",
-            lineHeight: 1.5, display: "-webkit-box",
-            WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden",
-          }}>
+          <p className="text-sm text-neutral-500 line-clamp-2 leading-relaxed">
             {product.description}
           </p>
         )}
 
-        {/* Divider */}
-        <div style={{ margin: "14px 0 12px", height: "1px", background: "rgba(77,71,50,0.2)" }} />
-
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-          <span style={{ fontSize: "20px", fontWeight: 800, color: "#ffd700", fontFamily: "Manrope, sans-serif", letterSpacing: "-0.02em" }}>
-            {formatted}
+        <div className="mt-2 pt-3 border-t border-neutral-100 flex items-center justify-between">
+          <span className="text-xs font-semibold tracking-widest uppercase text-neutral-400">
+            {new Date(product.createdAt).toLocaleDateString("en-US", { day: "numeric", month: "short", year: "numeric" })}
           </span>
-          <span style={{
-            fontSize: "10px", fontWeight: 700, letterSpacing: "0.14em",
-            textTransform: "uppercase", color: "#4d4732",
-            border: "1px solid rgba(77,71,50,0.35)", borderRadius: "20px",
-            padding: "3px 10px",
-          }}>
-            {new Date(product.createdAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
+          <span className="text-sm font-medium text-neutral-600 hover:text-neutral-900 transition-colors">
+            Edit
           </span>
         </div>
       </div>
@@ -211,39 +141,21 @@ const ProductCard = ({ product }) => {
 /*  Empty State                                                         */
 /* ------------------------------------------------------------------ */
 const EmptyState = ({ onAdd }) => (
-  <div style={{
-    gridColumn: "1 / -1",
-    display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
-    padding: "80px 20px", textAlign: "center",
-  }}>
-    <div style={{
-      width: "80px", height: "80px", borderRadius: "50%",
-      background: "rgba(77,71,50,0.12)", border: "1px dashed rgba(77,71,50,0.4)",
-      display: "flex", alignItems: "center", justifyContent: "center",
-      color: "#4d4732", marginBottom: "24px",
-    }}>
+  <div className="col-span-full flex flex-col items-center justify-center py-24 text-center border-2 border-dashed border-neutral-200 rounded-sm bg-neutral-50">
+    <div className="w-16 h-16 rounded-full bg-white border border-neutral-200 flex items-center justify-center text-neutral-400 mb-6 shadow-sm">
       <ImageIcon />
     </div>
-    <h3 style={{ margin: "0 0 8px", fontSize: "22px", fontWeight: 700, color: "#e5e2e1", fontFamily: "Manrope, sans-serif" }}>
+    <h3 className="text-xl font-serif text-neutral-900 mb-2">
       No products yet
     </h3>
-    <p style={{ margin: "0 0 28px", color: "#4d4732", fontSize: "14px" }}>
-      Start selling by listing your first product.
+    <p className="text-sm text-neutral-500 mb-8 max-w-sm">
+      Start your journey by creating your first product listing. It only takes a few minutes.
     </p>
     <button
       onClick={onAdd}
-      style={{
-        background: "linear-gradient(90deg,#ffd700,#e9c400)",
-        border: "none", borderRadius: "40px",
-        padding: "13px 32px", fontWeight: 700, fontSize: "13px",
-        letterSpacing: "0.15em", textTransform: "uppercase",
-        color: "#3a3000", cursor: "pointer",
-        transition: "transform 0.2s, box-shadow 0.2s",
-      }}
-      onMouseEnter={(e) => { e.currentTarget.style.transform = "scale(1.03)"; e.currentTarget.style.boxShadow = "0 0 28px rgba(255,215,0,0.25)"; }}
-      onMouseLeave={(e) => { e.currentTarget.style.transform = "scale(1)"; e.currentTarget.style.boxShadow = "none"; }}
+      className="bg-neutral-900 text-white px-8 py-3 rounded-sm font-semibold text-xs tracking-widest uppercase hover:bg-neutral-800 transition-colors shadow-sm flex items-center gap-2"
     >
-      + List a Product
+      <PlusIcon /> List a Product
     </button>
   </div>
 );
@@ -264,67 +176,52 @@ const Dashboard = () => {
   const totalImages = (sellerProducts || []).reduce((sum, p) => sum + (p.images?.length || 0), 0);
 
   return (
-    <div style={{
-      minHeight: "100vh",
-      background: "#131313",
-      fontFamily: "'Inter', sans-serif",
-      color: "#e5e2e1",
-    }}>
-      {/* ── Google Fonts ── */}
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Manrope:wght@700;800&display=swap');
-        * { box-sizing: border-box; }
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: #131313; }
-        ::-webkit-scrollbar-thumb { background: #2a2920; border-radius: 3px; }
-      `}</style>
+    <div className="min-h-screen bg-neutral-50 font-sans text-neutral-900 selection:bg-neutral-200">
+      
+      {/* Navbar Minimal */}
+      <nav className="sticky top-0 z-50 bg-white border-b border-neutral-200 px-6 sm:px-10 h-20 flex items-center justify-between">
+         <span 
+          onClick={() => navigate("/")}
+          className="font-serif font-bold text-2xl tracking-tighter text-neutral-900 cursor-pointer"
+        >
+          VEXTO <span className="font-sans text-sm font-medium tracking-widest uppercase text-neutral-400 ml-2">Seller</span>
+        </span>
+        <button 
+          onClick={() => navigate("/")}
+          className="text-sm font-semibold tracking-widest uppercase text-neutral-500 hover:text-neutral-900 transition-colors"
+        >
+          Storefront
+        </button>
+      </nav>
 
-      <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "56px 24px 80px" }}>
+      <div className="max-w-7xl mx-auto px-6 sm:px-10 py-12 lg:py-20">
 
         {/* ── Header ── */}
-        <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", marginBottom: "48px", flexWrap: "wrap", gap: "20px" }}>
+        <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
           <div>
-            <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "10px" }}>
-              <span style={{ color: "#4d4732" }}><GridIcon /></span>
-              <span style={{ fontSize: "12px", fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", color: "#4d4732" }}>
-                Seller Dashboard
+            <div className="flex items-center gap-2 mb-3">
+              <span className="text-neutral-400"><GridIcon /></span>
+              <span className="text-sm font-bold tracking-widest uppercase text-neutral-500">
+                Dashboard Overview
               </span>
             </div>
-            <h1 style={{
-              margin: 0, fontSize: "clamp(36px, 5vw, 56px)", fontWeight: 800,
-              fontFamily: "Manrope, sans-serif", letterSpacing: "-0.03em",
-              color: "#e5e2e1", lineHeight: 1.05,
-            }}>
+            <h1 className="font-serif text-5xl sm:text-6xl text-neutral-900 leading-tight">
               Your Products
             </h1>
-            <div style={{ marginTop: "12px", width: "40px", height: "2px", background: "linear-gradient(90deg,#ffd700,#e9c400)" }} />
           </div>
 
           <button
             id="create-product-btn"
             onClick={() => navigate("/seller/products/create")}
-            style={{
-              display: "flex", alignItems: "center", gap: "8px",
-              background: "linear-gradient(90deg,#ffd700,#e9c400)",
-              border: "none", borderRadius: "40px",
-              padding: "14px 28px", fontWeight: 700, fontSize: "13px",
-              letterSpacing: "0.14em", textTransform: "uppercase",
-              color: "#3a3000", cursor: "pointer",
-              transition: "transform 0.2s, box-shadow 0.2s",
-            }}
-            onMouseEnter={(e) => { e.currentTarget.style.transform = "scale(1.03)"; e.currentTarget.style.boxShadow = "0 0 28px rgba(255,215,0,0.28)"; }}
-            onMouseLeave={(e) => { e.currentTarget.style.transform = "scale(1)"; e.currentTarget.style.boxShadow = "none"; }}
+            className="flex items-center justify-center gap-2 bg-neutral-900 text-white px-6 py-3.5 rounded-sm font-semibold text-sm tracking-widest uppercase hover:bg-neutral-800 transition-colors shadow-sm"
           >
-            <PlusIcon /> New Product
+            <PlusIcon /> New Listing
           </button>
         </div>
 
         {/* ── Stats Bar ── */}
         {sellerProducts?.length > 0 && (
-          <div style={{
-            display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))",
-            gap: "16px", marginBottom: "48px",
-          }}>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-16">
             {[
               { label: "Total Listings", value: sellerProducts.length },
               {
@@ -333,15 +230,11 @@ const Dashboard = () => {
               },
               { label: "Total Photos", value: totalImages },
             ].map(({ label, value }) => (
-              <div key={label} style={{
-                background: "linear-gradient(160deg,#1a1a18,#111110)",
-                border: "1px solid rgba(77,71,50,0.25)",
-                borderRadius: "16px", padding: "20px 24px",
-              }}>
-                <p style={{ margin: "0 0 6px", fontSize: "11px", fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", color: "#4d4732" }}>
+              <div key={label} className="bg-white border border-neutral-200 rounded-sm p-6 shadow-sm">
+                <p className="text-[10px] font-bold tracking-widest uppercase text-neutral-500 mb-2">
                   {label}
                 </p>
-                <p style={{ margin: 0, fontSize: "26px", fontWeight: 800, fontFamily: "Manrope, sans-serif", color: "#ffd700", letterSpacing: "-0.02em" }}>
+                <p className="text-3xl font-serif text-neutral-900">
                   {value}
                 </p>
               </div>
@@ -351,15 +244,11 @@ const Dashboard = () => {
 
         {/* ── Products Grid ── */}
         {sellerProducts === undefined || sellerProducts === null ? (
-          <div style={{ textAlign: "center", padding: "80px 0", color: "#4d4732", fontSize: "14px" }}>
-            Loading products…
+          <div className="py-32 flex justify-center items-center">
+            <div className="w-8 h-8 border-2 border-neutral-300 border-t-neutral-900 rounded-full animate-spin"></div>
           </div>
         ) : (
-          <div style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
-            gap: "24px",
-          }}>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {sellerProducts.length === 0 ? (
               <EmptyState onAdd={() => navigate("/seller/products/create")} />
             ) : (

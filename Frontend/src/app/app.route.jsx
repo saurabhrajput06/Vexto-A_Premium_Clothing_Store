@@ -1,5 +1,5 @@
 import { createBrowserRouter, Outlet } from "react-router";
-import Register from "../Features/Auth/pages/register";
+import Register from "../Features/Auth/pages/Register";
 import Login from "../Features/Auth/pages/Login";
 import CreateProduct from "../Features/Products/Pages/CreateProduct";
 import Dashboard from "../Features/Products/Pages/Dashboard";

@@ -4,28 +4,28 @@ import { useProduct } from "../hook/useProduct";
 
 /* ── Icons ── */
 const ChevronLeftIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
     <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
   </svg>
 );
 const ChevronRightIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
     <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
   </svg>
 );
 const CartIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
     <path strokeLinecap="round" strokeLinejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-1.5 6h13" />
     <circle cx="9" cy="21" r="1" /><circle cx="19" cy="21" r="1" />
   </svg>
 );
 const BoltIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
     <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
   </svg>
 );
 const BackIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
     <path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
   </svg>
 );
@@ -51,18 +51,18 @@ const ProductDetails = () => {
 
   if (loading) {
     return (
-      <div style={{ minHeight: "100vh", background: "#0d0d0d", display: "flex", alignItems: "center", justifyContent: "center", color: "#ffd700", fontFamily: "Manrope, sans-serif", fontSize: "24px" }}>
-        Loading...
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-neutral-200 border-t-neutral-900 rounded-full animate-spin"></div>
       </div>
     );
   }
 
   if (!product) {
     return (
-      <div style={{ minHeight: "100vh", background: "#0d0d0d", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", color: "#e5e2e1", fontFamily: "Manrope, sans-serif" }}>
-        <h1 style={{ fontSize: "32px", marginBottom: "16px" }}>Product Not Found</h1>
-        <button onClick={() => navigate("/")} style={{ background: "transparent", border: "1px solid #ffd700", color: "#ffd700", padding: "10px 24px", borderRadius: "40px", cursor: "pointer", fontWeight: 600 }}>
-          Back to Home
+      <div className="min-h-screen bg-white flex flex-col items-center justify-center font-sans">
+        <h1 className="font-serif text-3xl text-neutral-900 mb-6">Product Not Found</h1>
+        <button onClick={() => navigate("/")} className="text-sm font-medium border border-neutral-900 text-neutral-900 px-8 py-3 rounded-sm hover:bg-neutral-900 hover:text-white transition-colors">
+          Return to Collection
         </button>
       </div>
     );
@@ -72,118 +72,113 @@ const ProductDetails = () => {
   const hasMultiple = images.length > 1;
   const currency = product.price?.currency || "INR";
   const amount = product.price?.amount;
-  const formattedPrice = amount != null ? new Intl.NumberFormat("en-IN", { style: "currency", currency }).format(amount) : "—";
+  const formattedPrice = amount != null ? new Intl.NumberFormat("en-IN", { style: "currency", currency, maximumFractionDigits: 0 }).format(amount) : "—";
 
   const prev = () => setImgIdx(i => (i === 0 ? images.length - 1 : i - 1));
   const next = () => setImgIdx(i => (i === images.length - 1 ? 0 : i + 1));
 
   return (
-    <div style={{ minHeight: "100vh", background: "#0d0d0d", fontFamily: "'Inter', sans-serif", color: "#e5e2e1" }}>
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Manrope:wght@700;800&display=swap');
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: #0d0d0d; }
-        ::-webkit-scrollbar-thumb { background: #2a2920; border-radius: 3px; }
-      `}</style>
-
+    <div className="min-h-screen bg-white font-sans text-neutral-900 selection:bg-neutral-200">
       {/* Navbar Minimal */}
-      <nav style={{ padding: "20px 32px", borderBottom: "1px solid rgba(77,71,50,0.2)" }}>
+      <nav className="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-neutral-100 px-6 sm:px-10 h-16 flex items-center">
         <button 
           onClick={() => navigate(-1)} 
-          style={{ display: "flex", alignItems: "center", gap: "8px", background: "transparent", border: "none", color: "#d0c6ab", cursor: "pointer", fontSize: "14px", fontWeight: 600, letterSpacing: "0.05em", transition: "color 0.2s" }}
-          onMouseEnter={e => e.currentTarget.style.color = "#ffd700"}
-          onMouseLeave={e => e.currentTarget.style.color = "#d0c6ab"}
+          className="flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-neutral-500 hover:text-neutral-900 transition-colors"
         >
           <BackIcon /> Back
         </button>
       </nav>
 
-      <div style={{ maxWidth: "1280px", margin: "0 auto", padding: "48px 32px", display: "flex", flexWrap: "wrap", gap: "64px" }}>
-        
-        {/* Left: Image Gallery */}
-        <div style={{ flex: "1 1 500px", display: "flex", flexDirection: "column", gap: "16px" }}>
-          {/* Main Image */}
-          <div style={{ position: "relative", aspectRatio: "4/5", background: "#1a1a18", borderRadius: "24px", overflow: "hidden", border: "1px solid rgba(77,71,50,0.3)" }}>
-            {images.length > 0 ? (
-              <img src={images[imgIdx]?.url} alt={product.title} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-            ) : (
-              <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", color: "#4d4732" }}>
-                No Image Available
+      <div className="max-w-[1440px] mx-auto px-6 sm:px-10 pt-16 pb-24 lg:pt-28 lg:pb-32">
+        <div className="flex flex-col lg:flex-row gap-16 xl:gap-24">
+          
+          {/* Left: Image Gallery */}
+          <div className="w-full lg:w-[55%] xl:w-[60%] flex flex-col gap-4">
+            {/* Main Image */}
+            <div className="relative aspect-[3/4] sm:aspect-[4/5] bg-neutral-50 rounded-sm overflow-hidden group">
+              {images.length > 0 ? (
+                <img src={images[imgIdx]?.url} alt={product.title} className="w-full h-full object-cover" />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center text-neutral-300 text-4xl">
+                  🖼
+                </div>
+              )}
+
+              {/* Navigation Arrows */}
+              {hasMultiple && (
+                <>
+                  <button onClick={prev} className="absolute left-4 top-1/2 -translate-y-1/2 p-3 bg-white/80 text-neutral-900 rounded-full backdrop-blur-md shadow-sm hover:bg-white transition-colors opacity-0 group-hover:opacity-100">
+                    <ChevronLeftIcon />
+                  </button>
+                  <button onClick={next} className="absolute right-4 top-1/2 -translate-y-1/2 p-3 bg-white/80 text-neutral-900 rounded-full backdrop-blur-md shadow-sm hover:bg-white transition-colors opacity-0 group-hover:opacity-100">
+                    <ChevronRightIcon />
+                  </button>
+                </>
+              )}
+            </div>
+
+            {/* Thumbnails */}
+            {hasMultiple && (
+              <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
+                {images.map((img, i) => (
+                  <button 
+                    key={i}
+                    onClick={() => setImgIdx(i)}
+                    className={`relative w-20 h-24 shrink-0 overflow-hidden rounded-sm transition-opacity duration-200 ${i === imgIdx ? 'opacity-100 ring-1 ring-neutral-900 ring-offset-2' : 'opacity-50 hover:opacity-100'}`}
+                  >
+                    <img src={img.url} alt={`Thumbnail ${i}`} className="w-full h-full object-cover" />
+                  </button>
+                ))}
               </div>
             )}
-
-            {/* Navigation Arrows */}
-            {hasMultiple && (
-              <>
-                <button onClick={prev} style={{ position: "absolute", left: "16px", top: "50%", transform: "translateY(-50%)", background: "rgba(19,19,19,0.78)", border: "none", borderRadius: "50%", width: "44px", height: "44px", display: "flex", alignItems: "center", justifyContent: "center", color: "#d0c6ab", cursor: "pointer", backdropFilter: "blur(4px)", transition: "background 0.2s, color 0.2s" }} onMouseEnter={e => { e.currentTarget.style.background = "rgba(255,215,0,0.2)"; e.currentTarget.style.color = "#ffd700"; }} onMouseLeave={e => { e.currentTarget.style.background = "rgba(19,19,19,0.78)"; e.currentTarget.style.color = "#d0c6ab"; }}>
-                  <ChevronLeftIcon />
-                </button>
-                <button onClick={next} style={{ position: "absolute", right: "16px", top: "50%", transform: "translateY(-50%)", background: "rgba(19,19,19,0.78)", border: "none", borderRadius: "50%", width: "44px", height: "44px", display: "flex", alignItems: "center", justifyContent: "center", color: "#d0c6ab", cursor: "pointer", backdropFilter: "blur(4px)", transition: "background 0.2s, color 0.2s" }} onMouseEnter={e => { e.currentTarget.style.background = "rgba(255,215,0,0.2)"; e.currentTarget.style.color = "#ffd700"; }} onMouseLeave={e => { e.currentTarget.style.background = "rgba(19,19,19,0.78)"; e.currentTarget.style.color = "#d0c6ab"; }}>
-                  <ChevronRightIcon />
-                </button>
-              </>
-            )}
           </div>
 
-          {/* Thumbnails */}
-          {hasMultiple && (
-            <div style={{ display: "flex", gap: "12px", overflowX: "auto", paddingBottom: "8px" }}>
-              {images.map((img, i) => (
-                <div 
-                  key={i}
-                  onClick={() => setImgIdx(i)}
-                  style={{ width: "80px", height: "80px", borderRadius: "12px", overflow: "hidden", border: `2px solid ${i === imgIdx ? "#ffd700" : "transparent"}`, cursor: "pointer", transition: "border-color 0.2s", opacity: i === imgIdx ? 1 : 0.6 }}
-                >
-                  <img src={img.url} alt={`Thumbnail ${i}`} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+          {/* Right: Product Info (Sticky on Desktop) */}
+          <div className="w-full lg:w-[45%] xl:w-[40%]">
+            <div className="lg:sticky lg:top-40 flex flex-col">
+              <p className="text-xs font-semibold tracking-[0.2em] uppercase text-neutral-400 mb-6">
+                Premium Collection
+              </p>
+              
+              <h1 className="font-serif text-4xl sm:text-5xl text-neutral-900 leading-tight mb-6">
+                {product.title}
+              </h1>
+              
+              <div className="text-2xl font-medium text-neutral-900 mb-8">
+                {formattedPrice}
+              </div>
+
+              <div className="h-px bg-neutral-200 mb-8" />
+
+              <div className="mb-10">
+                <h3 className="text-sm font-semibold uppercase tracking-widest text-[#6B7280] mb-4">DETAILS</h3>
+                <p className="text-neutral-600 leading-relaxed text-sm whitespace-pre-wrap">
+                  {product.description || "No description provided."}
+                </p>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex flex-col sm:flex-row gap-4 mt-auto">
+                <button className="flex-1 flex items-center justify-center gap-3 bg-white border border-neutral-900 text-neutral-900 px-8 py-4 rounded-sm font-semibold text-xs tracking-widest uppercase hover:bg-neutral-50 transition-colors">
+                  <CartIcon /> Add to Bag
+                </button>
+                <button className="flex-1 flex items-center justify-center gap-3 bg-neutral-900 text-white px-8 py-4 rounded-sm font-semibold text-xs tracking-widest uppercase hover:bg-neutral-800 transition-colors shadow-lg shadow-neutral-200">
+                  <BoltIcon /> Buy Now
+                </button>
+              </div>
+
+              {/* Additional Info */}
+              <div className="mt-12 pt-8 border-t border-neutral-100 flex flex-col gap-4 text-xs">
+                <div className="flex justify-between items-center">
+                  <span className="uppercase tracking-widest text-[#6B7280] font-semibold">LISTED ON</span>
+                  <span className="font-medium text-neutral-900">{new Date(product.createdAt).toLocaleDateString("en-US", { day: "numeric", month: "long", year: "numeric" })}</span>
                 </div>
-              ))}
-            </div>
-          )}
-        </div>
+                <div className="flex justify-between items-center">
+                  <span className="uppercase tracking-widest text-[#6B7280] font-semibold">SELLER ID</span>
+                  <span className="font-mono text-[10px] text-neutral-400 tracking-wider truncate max-w-[150px]">{product.seller}</span>
+                </div>
+              </div>
 
-        {/* Right: Product Info */}
-        <div style={{ flex: "1 1 400px", display: "flex", flexDirection: "column" }}>
-          <p style={{ fontSize: "12px", fontWeight: 700, letterSpacing: "0.2em", textTransform: "uppercase", color: "#4d4732", marginBottom: "16px" }}>
-            Premium Product
-          </p>
-          <h1 style={{ fontFamily: "Manrope, sans-serif", fontWeight: 800, fontSize: "clamp(32px, 4vw, 48px)", letterSpacing: "-0.02em", color: "#e5e2e1", lineHeight: 1.1, marginBottom: "24px" }}>
-            {product.title}
-          </h1>
-          
-          <div style={{ fontSize: "36px", fontWeight: 800, color: "#ffd700", fontFamily: "Manrope, sans-serif", letterSpacing: "-0.02em", marginBottom: "32px" }}>
-            {formattedPrice}
-          </div>
-
-          <div style={{ height: "1px", background: "rgba(77,71,50,0.2)", marginBottom: "32px" }} />
-
-          <div style={{ marginBottom: "40px" }}>
-            <h3 style={{ fontSize: "16px", fontWeight: 700, color: "#e5e2e1", marginBottom: "12px", fontFamily: "Manrope, sans-serif" }}>Description</h3>
-            <p style={{ fontSize: "15px", color: "#d0c6ab", lineHeight: 1.6, whiteSpace: "pre-wrap" }}>
-              {product.description || "No description provided."}
-            </p>
-          </div>
-
-          {/* Action Buttons */}
-          <div style={{ display: "flex", gap: "16px", marginTop: "auto", flexWrap: "wrap" }}>
-            <button style={{ flex: 1, minWidth: "200px", display: "flex", alignItems: "center", justifyContent: "center", gap: "10px", background: "transparent", border: "1px solid rgba(255,215,0,0.5)", borderRadius: "40px", padding: "18px 24px", color: "#ffd700", fontWeight: 700, fontSize: "14px", letterSpacing: "0.1em", textTransform: "uppercase", cursor: "pointer", transition: "all 0.2s" }} onMouseEnter={e => { e.currentTarget.style.background = "rgba(255,215,0,0.1)"; e.currentTarget.style.borderColor = "#ffd700"; }} onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.borderColor = "rgba(255,215,0,0.5)"; }}>
-              <CartIcon /> Add to Cart
-            </button>
-            <button style={{ flex: 1, minWidth: "200px", display: "flex", alignItems: "center", justifyContent: "center", gap: "10px", background: "linear-gradient(90deg,#ffd700,#e9c400)", border: "none", borderRadius: "40px", padding: "18px 24px", color: "#3a3000", fontWeight: 800, fontSize: "14px", letterSpacing: "0.1em", textTransform: "uppercase", cursor: "pointer", transition: "transform 0.2s, box-shadow 0.2s" }} onMouseEnter={e => { e.currentTarget.style.transform = "scale(1.02)"; e.currentTarget.style.boxShadow = "0 8px 32px rgba(255,215,0,0.3)"; }} onMouseLeave={e => { e.currentTarget.style.transform = "scale(1)"; e.currentTarget.style.boxShadow = "none"; }}>
-              <BoltIcon /> Buy Now
-            </button>
-          </div>
-
-          {/* Additional Info */}
-          <div style={{ marginTop: "32px", padding: "24px", background: "rgba(26,26,24,0.5)", border: "1px solid rgba(77,71,50,0.2)", borderRadius: "16px", display: "flex", flexDirection: "column", gap: "12px", fontSize: "13px", color: "#6b6658" }}>
-            <div style={{ display: "flex", justifyContent: "space-between" }}>
-              <span>Listed On</span>
-              <span style={{ color: "#d0c6ab", fontWeight: 600 }}>{new Date(product.createdAt).toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" })}</span>
-            </div>
-            <div style={{ height: "1px", background: "rgba(77,71,50,0.1)" }} />
-            <div style={{ display: "flex", justifyContent: "space-between" }}>
-              <span>Seller ID</span>
-              <span style={{ color: "#d0c6ab", fontWeight: 600, fontFamily: "monospace" }}>{product.seller}</span>
             </div>
           </div>
 

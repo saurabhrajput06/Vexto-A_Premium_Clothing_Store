@@ -46,7 +46,7 @@ const BackArrowIcon = () => (
     fill="none"
     viewBox="0 0 24 24"
     stroke="currentColor"
-    strokeWidth={2}
+    strokeWidth={1.5}
   >
     <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
   </svg>
@@ -72,11 +72,11 @@ const ImageSlot = ({ index, isPrimary, file, previewUrl, onFile, onRemove }) => 
 
   return (
     <div
-      className={`relative group flex flex-col items-center justify-center rounded-2xl border border-dashed transition-all duration-300 cursor-pointer
+      className={`relative group flex flex-col items-center justify-center rounded-sm border transition-all duration-300 cursor-pointer overflow-hidden
         ${isPrimary ? "col-span-2 row-span-2 min-h-[220px]" : "min-h-[120px]"}
         ${previewUrl
-          ? "border-[#ffd700]/40 bg-[#0e0e0e]"
-          : "border-[#4d4732]/40 bg-[#0e0e0e] hover:border-[#ffd700]/50 hover:bg-[#1c1b1b]"
+          ? "border-neutral-200 bg-neutral-50"
+          : "border-dashed border-neutral-300 bg-neutral-50 hover:border-neutral-400 hover:bg-neutral-100"
         }`}
       onClick={() => !previewUrl && inputRef.current?.click()}
       onDragOver={(e) => e.preventDefault()}
@@ -89,33 +89,33 @@ const ImageSlot = ({ index, isPrimary, file, previewUrl, onFile, onRemove }) => 
           <img
             src={previewUrl}
             alt={`Upload ${index + 1}`}
-            className="w-full h-full object-cover rounded-2xl"
+            className="w-full h-full object-cover"
           />
           {/* Remove overlay */}
           <button
             type="button"
             onClick={(e) => { e.stopPropagation(); onRemove(index); }}
-            className="absolute top-2 right-2 p-1.5 rounded-full bg-[#131313]/80 text-[#ffb4ab] opacity-0 group-hover:opacity-100 transition-opacity hover:bg-[#93000a]/80"
+            className="absolute top-2 right-2 p-1.5 rounded-full bg-white/90 text-neutral-900 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-white shadow-sm"
           >
             <TrashIcon />
           </button>
           {isPrimary && (
-            <span className="absolute bottom-2 left-3 text-xs font-semibold tracking-widest uppercase text-[#ffd700]/80">
+            <span className="absolute bottom-2 left-2 bg-white/90 px-2 py-1 rounded-sm text-[10px] font-bold tracking-widest uppercase text-neutral-900 shadow-sm">
               Primary
             </span>
           )}
         </>
       ) : (
         <>
-          <div className={`text-[#4d4732] group-hover:text-[#ffd700]/60 transition-colors ${isPrimary ? "mb-3" : "mb-1.5"}`}>
+          <div className={`text-neutral-400 group-hover:text-neutral-600 transition-colors ${isPrimary ? "mb-3" : "mb-1.5"}`}>
             <UploadIcon />
           </div>
           {isPrimary ? (
-            <span className="text-sm tracking-widest text-[#4d4732] group-hover:text-[#d0c6ab]/60 transition-colors uppercase font-medium">
+            <span className="text-xs tracking-widest text-neutral-500 group-hover:text-neutral-700 transition-colors uppercase font-bold">
               Primary Image
             </span>
           ) : (
-            <span className="text-xs tracking-wide text-[#4d4732] group-hover:text-[#d0c6ab]/50 transition-colors">
+            <span className="text-[10px] tracking-widest uppercase text-neutral-400 group-hover:text-neutral-600 transition-colors font-bold">
               Add photo
             </span>
           )}
@@ -203,7 +203,6 @@ const CreateProduct = () => {
     e.preventDefault();
     setIsSubmitting(true);
     try {
-      // TODO: wire up to useProduct hook / API
       const payload = new FormData();
       payload.append("title", formData.title);
       payload.append("description", formData.description);
@@ -214,7 +213,7 @@ const CreateProduct = () => {
       });
       console.log("Submitting product…", Object.fromEntries(payload));
       await handleCreateProduct(payload);
-      navigate("/");
+      navigate("/seller/dashboard");
     } finally {
       setIsSubmitting(false);
     }
@@ -222,52 +221,46 @@ const CreateProduct = () => {
 
   /* ---------------------------------------------------------------- */
   return (
-    <div
-      className="min-h-screen bg-[#131313] font-['Inter',sans-serif] py-14 px-6 lg:px-12"
-      style={{ fontFamily: "'Inter', sans-serif" }}
-    >
+    <div className="min-h-screen bg-white font-sans text-neutral-900 py-12 px-6 lg:px-10">
       <div className="max-w-6xl mx-auto">
 
         {/* ── Back navigation ── */}
         <button
           type="button"
           onClick={() => navigate(-1)}
-          className="flex items-center gap-2 text-[#d0c6ab] hover:text-[#ffd700] transition-colors mb-12 group"
+          className="flex items-center gap-2 text-xs font-semibold tracking-widest uppercase text-neutral-500 hover:text-neutral-900 transition-colors mb-12 group"
         >
-          <span className="group-hover:-translate-x-0.5 transition-transform">
+          <span className="group-hover:-translate-x-1 transition-transform">
             <BackArrowIcon />
           </span>
-          <span className="text-base tracking-wide">Back</span>
+          <span>Back to Dashboard</span>
         </button>
 
         {/* ── Page header ── */}
         <div className="mb-14">
-          <h1
-            className="text-5xl lg:text-6xl font-extrabold text-[#e5e2e1] tracking-tight leading-none mb-3"
-            style={{ fontFamily: "Manrope, sans-serif" }}
-          >
+          <p className="text-sm font-bold text-neutral-400 tracking-widest uppercase mb-3">
+            List your item
+          </p>
+          <h1 className="text-5xl lg:text-6xl font-serif text-neutral-900 tracking-tight leading-none mb-6">
             Create Product
           </h1>
-          <p className="text-base text-[#ffd700]/70 tracking-widest uppercase font-medium">
-            List your item for sale
-          </p>
-          <div className="mt-5 w-10 h-0.5 bg-gradient-to-r from-[#ffd700] to-[#e9c400]" />
+          <div className="w-12 h-0.5 bg-neutral-900" />
         </div>
 
         {/* ── Form ── */}
         <form onSubmit={handleSubmit}>
 
           {/* ── Desktop: two-column | Mobile: single-column ── */}
-          <div className="flex flex-col lg:flex-row lg:gap-16 gap-12">
+          <div className="flex flex-col lg:flex-row lg:gap-20 gap-16">
 
             {/* ════════════════════ LEFT COLUMN — form fields ════════════════════ */}
-            <div className="flex-1 space-y-10">
+            <div className="flex-1 space-y-8">
 
               {/* Section: Title */}
-              <div className="space-y-2">
+              <div className="space-y-3">
                 <label
                   htmlFor="title"
-                  className="block text-sm text-[#d0c6ab] tracking-widest uppercase font-semibold ml-1"
+                  className="block text-sm font-bold text-neutral-500 tracking-widest uppercase"
                 >
                   Product Title
                 </label>
@@ -279,15 +272,15 @@ const CreateProduct = () => {
                   onChange={handleChange}
                   placeholder="e.g. Vintage Leather Jacket"
                   required
-                  className="w-full bg-[#0e0e0e] text-[#e5e2e1] rounded-xl px-6 py-4 border border-[#4d4732]/20 focus:border-[#ffd700]/60 focus:ring-1 focus:ring-[#ffd700]/30 transition-all outline-none placeholder:text-[#4d4732] text-base"
+                  className="w-full bg-neutral-50 text-neutral-900 rounded-sm px-4 py-3.5 border border-neutral-200 focus:border-neutral-900 focus:bg-white transition-colors outline-none text-base placeholder:text-neutral-400"
                 />
               </div>
 
               {/* Section: Description */}
-              <div className="space-y-2">
+              <div className="space-y-3">
                 <label
                   htmlFor="description"
-                  className="block text-sm text-[#d0c6ab] tracking-widest uppercase font-semibold ml-1"
+                  className="block text-sm font-bold text-neutral-500 tracking-widest uppercase"
                 >
                   Description
                 </label>
@@ -296,16 +289,16 @@ const CreateProduct = () => {
                   name="description"
                   value={formData.description}
                   onChange={handleChange}
-                  rows={7}
+                  rows={8}
                   placeholder="Describe your product in detail — material, condition, sizing…"
                   required
-                  className="w-full bg-[#0e0e0e] text-[#e5e2e1] rounded-xl px-6 py-4 border border-[#4d4732]/20 focus:border-[#ffd700]/60 focus:ring-1 focus:ring-[#ffd700]/30 transition-all outline-none resize-none placeholder:text-[#4d4732] text-base leading-relaxed"
+                  className="w-full bg-neutral-50 text-neutral-900 rounded-sm px-4 py-3.5 border border-neutral-200 focus:border-neutral-900 focus:bg-white transition-colors outline-none text-base placeholder:text-neutral-400 resize-none"
                 />
               </div>
 
               {/* Section: Price */}
               <div className="space-y-3">
-                <span className="block text-sm text-[#d0c6ab] tracking-widest uppercase font-semibold ml-1">
+                <span className="block text-sm font-bold text-neutral-500 tracking-widest uppercase">
                   Price
                 </span>
                 <div className="flex gap-4">
@@ -322,27 +315,27 @@ const CreateProduct = () => {
                       min="0"
                       step="0.01"
                       required
-                      className="w-full bg-[#0e0e0e] text-[#e5e2e1] rounded-xl px-6 py-4 border border-[#4d4732]/20 focus:border-[#ffd700]/60 focus:ring-1 focus:ring-[#ffd700]/30 transition-all outline-none placeholder:text-[#4d4732] text-base"
+                      className="w-full bg-neutral-50 text-neutral-900 rounded-sm px-4 py-3.5 border border-neutral-200 focus:border-neutral-900 focus:bg-white transition-colors outline-none text-base placeholder:text-neutral-400"
                     />
                   </div>
 
                   {/* Currency */}
-                  <div className="w-36">
+                  <div className="w-32">
                     <label htmlFor="priceCurrency" className="sr-only">Currency</label>
                     <select
                       id="priceCurrency"
                       name="priceCurrency"
                       value={formData.priceCurrency}
                       onChange={handleChange}
-                      className="w-full bg-[#0e0e0e] text-[#e5e2e1] rounded-xl px-5 py-4 border border-[#4d4732]/20 focus:border-[#ffd700]/60 focus:ring-1 focus:ring-[#ffd700]/30 transition-all outline-none text-base appearance-none cursor-pointer"
+                      className="w-full bg-neutral-50 text-neutral-900 rounded-sm px-4 py-3.5 border border-neutral-200 focus:border-neutral-900 focus:bg-white transition-colors outline-none text-base appearance-none cursor-pointer"
                       style={{
-                        backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23d0c6ab' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")`,
+                        backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23333' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")`,
                         backgroundRepeat: "no-repeat",
                         backgroundPosition: "right 1rem center",
                       }}
                     >
                       {CURRENCIES.map((c) => (
-                        <option key={c} value={c} className="bg-[#1c1b1b]">
+                        <option key={c} value={c}>
                           {c}
                         </option>
                       ))}
@@ -351,14 +344,12 @@ const CreateProduct = () => {
                 </div>
               </div>
 
-              {/* Publish button — visible only on desktop (sits under Left column) */}
-              <div className="hidden lg:block pt-4">
+              {/* Publish button — visible only on desktop */}
+              <div className="hidden lg:block pt-8 border-t border-neutral-100">
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full bg-gradient-to-r from-[#ffd700] to-[#e9c400] text-[#3a3000] rounded-full py-4 px-8 font-bold text-base tracking-[0.18em] uppercase transition-all duration-300
-                    hover:shadow-[0_0_28px_rgba(255,215,0,0.25)] hover:scale-[1.01]
-                    disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                  className="w-full bg-neutral-900 text-white rounded-sm py-4 px-8 font-semibold text-xs tracking-widest uppercase hover:bg-neutral-800 transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isSubmitting ? "Publishing…" : "Publish Product"}
                 </button>
@@ -367,26 +358,27 @@ const CreateProduct = () => {
             </div>
 
             {/* ════════════════════ RIGHT COLUMN — images ════════════════════ */}
-            <div className="lg:w-[420px] xl:w-[480px] space-y-4 lg:pt-0">
+            <div className="lg:w-[480px] space-y-6">
 
               {/* Images header */}
-              <div className="flex items-end justify-between ml-1">
-                <span className="block text-sm text-[#d0c6ab] tracking-widest uppercase font-semibold">
-                  Product Images
-                </span>
-                <div className="flex items-center gap-3">
-                  {/* Bulk select button */}
-                  <button
-                    type="button"
-                    onClick={() => bulkInputRef.current?.click()}
-                    className="text-xs text-[#ffd700]/60 hover:text-[#ffd700] tracking-wide transition-colors underline underline-offset-2"
-                  >
-                    Select all
-                  </button>
-                  <span className="text-xs text-[#4d4732] tracking-wide">
-                    {images.filter(Boolean).length}/{MAX_IMAGES} added
+              <div className="flex flex-col gap-2">
+                <div className="flex items-end justify-between">
+                  <span className="block text-xs font-bold text-neutral-500 tracking-widest uppercase">
+                    Product Images
                   </span>
+                  <div className="flex items-center gap-3">
+                    <button
+                      type="button"
+                      onClick={() => bulkInputRef.current?.click()}
+                      className="text-xs font-semibold text-neutral-500 hover:text-neutral-900 tracking-wide transition-colors underline underline-offset-4"
+                    >
+                      Select all
+                    </button>
+                  </div>
                 </div>
+                <span className="text-[10px] text-neutral-400 font-medium tracking-wide uppercase">
+                  {images.filter(Boolean).length}/{MAX_IMAGES} Added · JPEG/PNG
+                </span>
               </div>
 
               {/* Hidden multi-file input for bulk select */}
@@ -401,15 +393,14 @@ const CreateProduct = () => {
 
               {/* ── Bulk drag-and-drop wrapper ── */}
               <div
-                className={`relative rounded-2xl transition-all duration-300 ${
+                className={`relative transition-all duration-300 ${
                   isDragOver
-                    ? "ring-2 ring-[#ffd700]/60 shadow-[0_0_32px_rgba(255,215,0,0.12)]"
+                    ? "ring-2 ring-neutral-900 ring-offset-4 rounded-sm"
                     : ""
                 }`}
                 onDragEnter={(e) => { e.preventDefault(); setIsDragOver(true); }}
                 onDragOver={(e) => { e.preventDefault(); setIsDragOver(true); }}
                 onDragLeave={(e) => {
-                  // only fire when leaving the wrapper itself
                   if (!e.currentTarget.contains(e.relatedTarget)) setIsDragOver(false);
                 }}
                 onDrop={(e) => {
@@ -418,25 +409,20 @@ const CreateProduct = () => {
                   handleBulkFiles(e.dataTransfer.files);
                 }}
               >
-                {/* Gold overlay while dragging */}
+                {/* Overlay while dragging */}
                 {isDragOver && (
-                  <div className="absolute inset-0 z-10 rounded-2xl bg-[#ffd700]/5 border-2 border-dashed border-[#ffd700]/50 flex flex-col items-center justify-center pointer-events-none">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="w-8 h-8 text-[#ffd700]/70 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
-                    </svg>
-                    <span className="text-sm text-[#ffd700]/80 tracking-widest uppercase font-semibold">
-                      Drop all photos here
+                  <div className="absolute inset-0 z-10 rounded-sm bg-neutral-100/90 border-2 border-dashed border-neutral-400 flex flex-col items-center justify-center pointer-events-none backdrop-blur-sm">
+                    <UploadIcon className="text-neutral-600 mb-2 w-8 h-8" />
+                    <span className="text-xs text-neutral-900 tracking-widest uppercase font-bold">
+                      Drop photos here
                     </span>
                   </div>
                 )}
 
-                {/* Image grid:
-                    Primary slot spans 2 cols × 2 rows.
-                    Slots 1-2 sit in the 3rd column (rows 1-2).
-                    Slots 3-6 fill the bottom two rows across 3 cols. */}
+                {/* Image grid */}
                 <div className="grid grid-cols-3 gap-3">
                   {/* Primary — 2 cols × 2 rows */}
-                  <div className="col-span-2 row-span-2 min-h-[180px] lg:min-h-[220px]">
+                  <div className="col-span-2 row-span-2 min-h-[220px]">
                     <ImageSlot
                       index={0}
                       isPrimary
@@ -449,7 +435,7 @@ const CreateProduct = () => {
 
                   {/* Slots 1-2 (3rd col, rows 1-2) */}
                   {[1, 2].map((i) => (
-                    <div key={i} className="min-h-[86px] lg:min-h-[104px]">
+                    <div key={i} className="min-h-[104px]">
                       <ImageSlot
                         index={i}
                         isPrimary={false}
@@ -463,7 +449,7 @@ const CreateProduct = () => {
 
                   {/* Slots 3-6 (bottom, 3 across) */}
                   {[3, 4, 5, 6].map((i) => (
-                    <div key={i} className="min-h-[86px] lg:min-h-[104px]">
+                    <div key={i} className="min-h-[104px]">
                       <ImageSlot
                         index={i}
                         isPrimary={false}
@@ -477,21 +463,16 @@ const CreateProduct = () => {
                 </div>
               </div>{/* end bulk drop wrapper */}
 
-              <p className="text-xs text-[#4d4732] tracking-wide ml-1">
-                Drop multiple photos at once · or click any slot · JPEG, PNG, WebP · Max 7
-              </p>
             </div>
 
           </div>{/* end two-col */}
 
-          {/* Publish button — mobile only (full-width below everything) */}
-          <div className="lg:hidden pt-10">
+          {/* Publish button — mobile only */}
+          <div className="lg:hidden pt-12">
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full bg-gradient-to-r from-[#ffd700] to-[#e9c400] text-[#3a3000] rounded-full py-4 px-8 font-bold text-base tracking-[0.18em] uppercase transition-all duration-300
-                hover:shadow-[0_0_28px_rgba(255,215,0,0.25)] hover:scale-[1.01]
-                disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+               className="w-full bg-neutral-900 text-white rounded-sm py-4 px-8 font-semibold text-xs tracking-widest uppercase hover:bg-neutral-800 transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isSubmitting ? "Publishing…" : "Publish Product"}
             </button>
@@ -499,7 +480,6 @@ const CreateProduct = () => {
 
         </form>
 
-        {/* Bottom breathing space */}
         <div className="h-24" />
       </div>
     </div>
