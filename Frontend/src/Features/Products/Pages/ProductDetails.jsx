@@ -38,6 +38,7 @@ const ProductDetails = () => {
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [imgIdx, setImgIdx] = useState(0);
+  const [selectedVariant, setSelectedVariant] = useState(null);
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -68,14 +69,41 @@ const ProductDetails = () => {
     );
   }
 
-  const images = product.images || [];
+  // Fallback logic: Use selected variant values, otherwise fallback to main product
+  const images = (selectedVariant?.images && selectedVariant.images.length > 0) ? selectedVariant.images : (product.images || []);
   const hasMultiple = images.length > 1;
-  const currency = product.price?.currency || "INR";
-  const amount = product.price?.amount;
+  const currency = selectedVariant?.price?.currency || product.price?.currency || "INR";
+  const amount = selectedVariant?.price?.amount ?? product.price?.amount;
+  
   const formattedPrice = amount != null ? new Intl.NumberFormat("en-IN", { style: "currency", currency, maximumFractionDigits: 0 }).format(amount) : "—";
+  const variants = product.variants || [];
+  const hasVariants = variants.length > 0;
+
+  // Stock Calculation
+  let stockNumber = undefined;
+  let isOutOfStock = false;
+
+  if (hasVariants) {
+      if (selectedVariant) {
+          stockNumber = selectedVariant.stock;
+          isOutOfStock = stockNumber === 0;
+      } else {
+          stockNumber = variants.reduce((sum, v) => sum + (v.stock || 0), 0);
+          isOutOfStock = stockNumber === 0;
+      }
+  } else {
+      stockNumber = product.stock; 
+      isOutOfStock = stockNumber === 0; // If undefined, it's in stock
+  }
 
   const prev = () => setImgIdx(i => (i === 0 ? images.length - 1 : i - 1));
   const next = () => setImgIdx(i => (i === images.length - 1 ? 0 : i + 1));
+
+  // Reset image index when variant changes to ensure we show the first image of the new variant
+  const handleVariantSelect = (variant) => {
+      setSelectedVariant(selectedVariant?._id === variant._id ? null : variant);
+      setImgIdx(0); 
+  };
 
   return (
     <div className="min-h-screen bg-white font-sans text-neutral-900 selection:bg-neutral-200">
@@ -96,8 +124,8 @@ const ProductDetails = () => {
           <div className="w-full lg:w-[55%] xl:w-[60%] flex flex-col gap-4">
             {/* Main Image */}
             <div className="relative aspect-[3/4] sm:aspect-[4/5] bg-neutral-50 rounded-sm overflow-hidden group">
-              {images.length > 0 ? (
-                <img src={images[imgIdx]?.url} alt={product.title} className="w-full h-full object-cover" />
+              {images.length > 0 && images[imgIdx] ? (
+                <img src={images[imgIdx].url} alt={product.title} className="w-full h-full object-cover" />
               ) : (
                 <div className="w-full h-full flex items-center justify-center text-neutral-300 text-4xl">
                   🖼
@@ -140,15 +168,67 @@ const ProductDetails = () => {
                 Premium Collection
               </p>
               
-              <h1 className="font-serif text-4xl sm:text-5xl text-neutral-900 leading-tight mb-6">
+              <h1 className="font-serif text-4xl sm:text-5xl text-neutral-900 leading-tight mb-4">
                 {product.title}
               </h1>
               
-              <div className="text-2xl font-medium text-neutral-900 mb-8">
+              <div className="text-2xl font-medium text-neutral-900 mb-2">
                 {formattedPrice}
               </div>
 
+              {/* Stock Status */}
+              <div className="mb-8">
+                  {!isOutOfStock ? (
+                      <span className="text-sm font-medium text-green-700 bg-green-50 px-3 py-1 rounded-full border border-green-200">
+                          {stockNumber > 0 ? `In Stock (${stockNumber})` : "In Stock"}
+                      </span>
+                  ) : (
+                      <span className="text-sm font-medium text-red-700 bg-red-50 px-3 py-1 rounded-full border border-red-200">
+                          Out of Stock
+                      </span>
+                  )}
+              </div>
+
               <div className="h-px bg-neutral-200 mb-8" />
+
+              {/* Variant Selector */}
+              {variants.length > 0 && (
+                <div className="mb-8">
+                  <h3 className="text-sm font-semibold uppercase tracking-widest text-[#6B7280] mb-4">Select Option</h3>
+                  <div className="flex flex-wrap gap-3">
+                    
+                    {/* Main Product Button */}
+                    <button 
+                      onClick={() => {
+                        setSelectedVariant(null);
+                        setImgIdx(0);
+                      }}
+                      className={`px-5 py-2.5 text-sm font-medium rounded-sm border transition-all ${selectedVariant === null ? 'border-neutral-900 bg-neutral-900 text-white shadow-md' : 'border-neutral-200 text-neutral-900 hover:border-neutral-900 bg-white'}`}
+                    >
+                      <span className="capitalize">Standard</span>
+                    </button>
+
+                    {variants.map((variant) => {
+                      // Generate a label from attributes, e.g., "Red / M"
+                      const label = variant.attributes && Object.keys(variant.attributes).length > 0
+                        ? Object.entries(variant.attributes).map(([k, v]) => `${v}`).join(' / ') 
+                        : `Variant`;
+                      
+                      const isSelected = selectedVariant?._id === variant._id;
+                      
+                      return (
+                        <button 
+                          key={variant._id}
+                          onClick={() => handleVariantSelect(variant)}
+                          className={`px-5 py-2.5 text-sm font-medium rounded-sm border transition-all ${isSelected ? 'border-neutral-900 bg-neutral-900 text-white shadow-md' : 'border-neutral-200 text-neutral-900 hover:border-neutral-900 bg-white'}`}
+                        >
+                          <span className="capitalize">{label}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
 
               <div className="mb-10">
                 <h3 className="text-sm font-semibold uppercase tracking-widest text-[#6B7280] mb-4">DETAILS</h3>
@@ -159,10 +239,16 @@ const ProductDetails = () => {
 
               {/* Action Buttons */}
               <div className="flex flex-col sm:flex-row gap-4 mt-auto">
-                <button className="flex-1 flex items-center justify-center gap-3 bg-white border border-neutral-900 text-neutral-900 px-8 py-4 rounded-sm font-semibold text-xs tracking-widest uppercase hover:bg-neutral-50 transition-colors">
+                <button 
+                  disabled={isOutOfStock}
+                  className="flex-1 flex items-center justify-center gap-3 bg-white border border-neutral-900 text-neutral-900 px-8 py-4 rounded-sm font-semibold text-xs tracking-widest uppercase hover:bg-neutral-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
                   <CartIcon /> Add to Bag
                 </button>
-                <button className="flex-1 flex items-center justify-center gap-3 bg-neutral-900 text-white px-8 py-4 rounded-sm font-semibold text-xs tracking-widest uppercase hover:bg-neutral-800 transition-colors shadow-lg shadow-neutral-200">
+                <button 
+                  disabled={isOutOfStock}
+                  className="flex-1 flex items-center justify-center gap-3 bg-neutral-900 text-white px-8 py-4 rounded-sm font-semibold text-xs tracking-widest uppercase hover:bg-neutral-800 transition-colors shadow-lg shadow-neutral-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
                   <BoltIcon /> Buy Now
                 </button>
               </div>
