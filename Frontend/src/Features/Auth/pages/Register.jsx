@@ -45,7 +45,7 @@ const Register = () => {
         {/* Fashion Image Background */}
         <div 
           className="absolute inset-0 bg-cover bg-center z-0" 
-          style={{ backgroundImage: "url('/vexto_premium_model.png')" }}
+          style={{ backgroundImage: "url('/vexto_pretty_model.png')" }}
         ></div>
         {/* Minimal Gradient Overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent z-10 transition-opacity"></div>

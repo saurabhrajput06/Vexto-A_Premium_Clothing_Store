@@ -2,7 +2,7 @@ import express from "express";
 import { AuthenticateSeller } from "../Middleware/auth.middleware.js";
 import multer from "multer";
 import { createProductValidator } from "../Validator/product.validator.js";
-import { createProduct, getSellerProducts , getAllProducts, getProductById } from "../Controllers/product.controller.js";
+import { createProduct, getSellerProducts , getAllProducts, getProductById, addProductVariant, updateVariantStock } from "../Controllers/product.controller.js";
 
 
 const upload = multer({ storage: multer.memoryStorage(),
@@ -18,6 +18,20 @@ const router = express.Router();
  * @access Private {Seller only}
  */
 router.post("/", AuthenticateSeller, upload.array("images",7), createProductValidator, createProduct)
+
+/**
+ * @route POST/api/products/:id/variants
+ * @description Create a new product variant
+ * @access Private {Seller only}
+ */
+router.post("/:id/variants", AuthenticateSeller, upload.array("images", 7), addProductVariant);
+
+/**
+ * @route PATCH/api/products/:id/variants/:variantId/stock
+ * @description Update variant stock
+ * @access Private {Seller only}
+ */
+router.patch("/:id/variants/:variantId/stock", AuthenticateSeller, updateVariantStock);
 
 /**
  * @route Get/api/products/selller

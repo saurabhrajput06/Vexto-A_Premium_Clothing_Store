@@ -60,9 +60,10 @@ const ProductCard = ({ product }) => {
     amount != null
       ? new Intl.NumberFormat("en-IN", { style: "currency", currency, maximumFractionDigits: 0 }).format(amount)
       : "—";
-
+ const navigate = useNavigate();
   return (
     <div
+    onClick={() => navigate(`/seller/products/${product._id}`)}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       className="group flex flex-col bg-white border border-neutral-200 rounded-sm overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-1 cursor-pointer"

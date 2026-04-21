@@ -27,6 +27,18 @@ export async function getAllProducts(){
 }
 
 export async function getProductById(id) {
+    console.log("Fetching product with ID:", id);
     const response = await productApi.get(`/${id}`);
+    console.log("Response:", response.data);
     return response.data;
 }
+
+export async function createProductVariant(productId, formData) {
+    const response = await productApi.post(`/${productId}/variants`, formData);
+    return response.data;
+}
+
+export async function updateProductVariantStock(productId, variantId, stock) {
+    const response = await productApi.patch(`/${productId}/variants/${variantId}/stock`, { stock });
+    return response.data;
+}
