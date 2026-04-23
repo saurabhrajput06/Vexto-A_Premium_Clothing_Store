@@ -2,6 +2,7 @@ import jwt from "jsonwebtoken";
 import {config} from "../config/config.js";
 import userModel from "../Models/user.model.js";
 
+
 export const AuthenticateSeller = async (req , res , next)=>{
 const token = req.cookies.token
 if(!token){

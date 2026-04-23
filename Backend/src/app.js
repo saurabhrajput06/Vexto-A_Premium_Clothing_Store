@@ -3,7 +3,10 @@ import express from "express";
 import morgan from "morgan";
 import authRoutes from "./Routes/auth.routes.js";
 import productRoutes from "./Routes/product.routes.js";
+import cartRoutes from "./Routes/cart.route.js";
 import cors from "cors";
+
+
 
 //GoogleAuthentication
 import passport from "passport";
@@ -15,11 +18,11 @@ import {config} from "./config/config.js";
 
 const app = express();
 
-// app.use(cors({
-//     origin:"http://localhost:5173",
-//     methods:["GET","POST","PUT","DELETE"],
-//     credentials:true,
-// }));
+app.use(cors({
+    origin:"http://localhost:5173",
+    methods:["GET","POST","PUT","DELETE"],
+    credentials:true,
+}));
 
 
 
@@ -49,6 +52,11 @@ app.get("/", (req, res) => {
 //Routes
 app.use("/api/auth",authRoutes);
 app.use("/api/products",productRoutes);
+app.use("/api/cart", (req, res, next) => {
+    console.log("Cart Route Hit! Path:", req.path);
+    next();
+}, cartRoutes);
+// app.use("/api/cart",cartRoutes);
 
 
 

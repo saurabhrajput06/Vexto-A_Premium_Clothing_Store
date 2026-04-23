@@ -1,6 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router";
 import { useProduct } from "../hook/useProduct";
+import { useCart } from "../../Cart/Hook/useCart";
+
+
+
+
+
+
 
 /* ── Icons ── */
 const ChevronLeftIcon = () => (
@@ -34,6 +41,7 @@ const ProductDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { handleGetProductById } = useProduct();
+  const { handleAddToCart } = useCart();
   
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -104,6 +112,7 @@ const ProductDetails = () => {
       setSelectedVariant(selectedVariant?._id === variant._id ? null : variant);
       setImgIdx(0); 
   };
+  // console.log({product , selectedVariant})
 
   return (
     <div className="min-h-screen bg-white font-sans text-neutral-900 selection:bg-neutral-200">
@@ -240,8 +249,15 @@ const ProductDetails = () => {
               {/* Action Buttons */}
               <div className="flex flex-col sm:flex-row gap-4 mt-auto">
                 <button 
+
                   disabled={isOutOfStock}
                   className="flex-1 flex items-center justify-center gap-3 bg-white border border-neutral-900 text-neutral-900 px-8 py-4 rounded-sm font-semibold text-xs tracking-widest uppercase hover:bg-neutral-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  onClick={() => {
+                    handleAddToCart({
+                      productId: product._id,
+                      variantId: selectedVariant?._id
+                    });
+                  }}
                 >
                   <CartIcon /> Add to Bag
                 </button>
