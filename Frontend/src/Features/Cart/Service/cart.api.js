@@ -17,7 +17,17 @@ const url = variantId
     return response.data;
 }
 
+export const getCart = async () =>{
+    const response = await cartApiInstance.get("/")
+    return response.data;
+}
 
+export const removeItem = async (itemId) => {
+    const response = await cartApiInstance.delete(`/item/${itemId}`)
+    return response.data;
+}
 
-
-
+export const updateItem = async (itemId, quantity) => {
+    const response = await cartApiInstance.patch(`/item/${itemId}`, { quantity })
+    return response.data;
+}

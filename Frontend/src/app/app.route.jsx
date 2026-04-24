@@ -3,6 +3,7 @@ import Register from "../Features/Auth/pages/Register";
 import Login from "../Features/Auth/pages/Login";
 import CreateProduct from "../Features/Products/Pages/CreateProduct";
 import Dashboard from "../Features/Products/Pages/Dashboard";
+import Cart from "../Features/Cart/pages/Cart";
 
 import Protected from "../Features/Auth/components/Protected";
 import Home from "../Features/Products/Pages/Home";
@@ -21,6 +22,12 @@ export const router = createBrowserRouter([
     {
         path: "/register",
         element: <Register />
+    },
+    {
+        path: "/cart",
+        element : <Protected>
+            <Cart />
+        </Protected>
     },
     {
         path: "/product/:id",

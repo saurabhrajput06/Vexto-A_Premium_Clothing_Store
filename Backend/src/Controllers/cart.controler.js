@@ -106,3 +106,85 @@ export const getCart = async (req, res) => {
         return res.status(500).json({ message: "Internal server error", success: false })
     }
 }
+
+export const removeFromCart = async (req, res) => {
+    try {
+        const { itemId } = req.params
+        const cart = await cartModel.findOne({ user: req.user._id })
+
+        if (!cart) {
+            return res.status(404).json({ message: "Cart not found", success: false })
+        }
+
+        cart.items = cart.items.filter(item => item._id.toString() !== itemId)
+        await cart.save()
+
+        // Re-populate after save so the response matches getCart format
+        const updatedCart = await cartModel.findOne({ user: req.user._id }).populate("items.product")
+
+        return res.status(200).json({
+            message: "Item removed from cart",
+            success: true,
+            data: updatedCart
+        })
+    } catch (error) {
+        console.log(error)
+        return res.status(500).json({ message: "Internal server error", success: false })
+    }
+}
+
+export const updateCartItem = async (req, res) => {
+    try {
+        const { itemId } = req.params
+        const { quantity } = req.body
+
+        if (!quantity || quantity < 1) {
+            return res.status(400).json({ message: "Quantity must be at least 1", success: false })
+        }
+
+        const cart = await cartModel.findOne({ user: req.user._id })
+
+        if (!cart) {
+            return res.status(404).json({ message: "Cart not found", success: false })
+        }
+
+        const item = cart.items.find(item => item._id.toString() === itemId)
+        if (!item) {
+            return res.status(404).json({ message: "Item not found in cart", success: false })
+        }
+
+        // Check stock
+        const product = await productModel.findById(item.product)
+        if (!product) {
+            return res.status(404).json({ message: "Product not found", success: false })
+        }
+
+        let stock = Infinity
+        if (item.variant) {
+            stock = await stockOfVariantInProduct(item.product, item.variant)
+        } else {
+            stock = product.stock ?? Infinity
+        }
+
+        if (quantity > stock) {
+            return res.status(400).json({
+                message: `Only ${stock} available in stock`,
+                success: false
+            })
+        }
+
+        item.quantity = quantity
+        await cart.save()
+
+        const updatedCart = await cartModel.findOne({ user: req.user._id }).populate("items.product")
+
+        return res.status(200).json({
+            message: "Cart updated successfully",
+            success: true,
+            data: updatedCart
+        })
+    } catch (error) {
+        console.log(error)
+        return res.status(500).json({ message: "Internal server error", success: false })
+    }
+}
