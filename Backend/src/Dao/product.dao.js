@@ -7,12 +7,12 @@ const product = await productModel.findOne({
     "variants._id":variantId
 })
 
+if (!product) return null
 
+const variant = product.variants.find(variant => variant._id.toString() === variantId)
 
-const stock = product.variants.find(variant => variant._id.toString() === variantId)?.stock
-
-if (!stock){
+if (!variant || variant.stock == null){
     return null
 }
-return stock
+return variant.stock
 }

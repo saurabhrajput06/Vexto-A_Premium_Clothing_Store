@@ -15,3 +15,18 @@ export const validateAddToCart = [
     body("quantity").optional().isInt({ min: 1 }).withMessage("Quantity must be at least 1"),
     validateRequest
 ]
+
+export const validateUpdateCartItem = [
+    param("itemId").notEmpty().withMessage("Item ID is required"),
+    body("quantity").optional().isInt({ min: 1 }).withMessage("Quantity must be at least 1"),
+    validateRequest
+]
+
+export const validateRemoveFromCart = [
+    param("itemId").notEmpty().withMessage("Item ID is required"),
+    validateRequest
+]
+
+export const validateClearCart = [
+    validateRequest
+]

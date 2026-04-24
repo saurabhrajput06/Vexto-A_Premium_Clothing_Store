@@ -159,14 +159,14 @@ export const updateCartItem = async (req, res) => {
             return res.status(404).json({ message: "Product not found", success: false })
         }
 
-        let stock = Infinity
+        let stock = null
         if (item.variant) {
             stock = await stockOfVariantInProduct(item.product, item.variant)
         } else {
-            stock = product.stock ?? Infinity
+            stock = product.stock ?? null
         }
 
-        if (quantity > stock) {
+        if (stock != null && quantity > stock) {
             return res.status(400).json({
                 message: `Only ${stock} available in stock`,
                 success: false
