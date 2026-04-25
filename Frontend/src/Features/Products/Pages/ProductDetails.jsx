@@ -90,6 +90,9 @@ const ProductDetails = () => {
       setLoading(true);
       const data = await handleGetProductById(id);
       setProduct(data);
+      if (data?.variants?.length > 0) {
+        setSelectedVariant(data.variants[0]);
+      }
       setLoading(false);
     };
     fetchProduct();
@@ -280,17 +283,6 @@ const ProductDetails = () => {
                   <h3 className="text-[10px] font-semibold uppercase tracking-[0.2em] text-neutral-400 mb-4">Select Option</h3>
                   <div className="flex flex-wrap gap-3">
 
-                    {/* Main Product Button */}
-                    <button
-                      onClick={() => {
-                        setSelectedVariant(null);
-                        setImgIdx(0);
-                      }}
-                      className={`px-5 py-2.5 text-sm font-medium rounded-md border transition-all ${selectedVariant === null ? 'border-neutral-900 bg-neutral-900 text-white shadow-md' : 'border-neutral-200 text-neutral-700 hover:border-neutral-900 bg-white'}`}
-                    >
-                      <span className="capitalize">Standard</span>
-                    </button>
-
                     {variants.map((variant) => {
                       // Generate a label from attributes, e.g., "Red / M"
                       const label = variant.attributes && Object.keys(variant.attributes).length > 0
@@ -305,7 +297,7 @@ const ProductDetails = () => {
                           onClick={() => handleVariantSelect(variant)}
                           className={`px-5 py-2.5 text-sm font-medium rounded-md border transition-all ${isSelected ? 'border-neutral-900 bg-neutral-900 text-white shadow-md' : 'border-neutral-200 text-neutral-700 hover:border-neutral-900 bg-white'}`}
                         >
-                          <span className="capitalize">{label}</span>
+                          <span className="capitalize">{isSelected ? `✓${label}` : label}</span>
                         </button>
                       );
                     })}

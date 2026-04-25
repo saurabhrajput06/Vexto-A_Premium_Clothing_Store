@@ -136,12 +136,14 @@ const CartItem = ({ item, onRemove, onUpdateQuantity, removingId }) => {
   // console.log(item)
   return (
     <div
-      className={`group transition-all duration-500 ease-out ${isRemoving ? 'opacity-0 scale-95 max-h-0 -mb-6' : 'opacity-100 scale-100 max-h-[300px]'}`}
+      className={`group transition-all duration-500 ease-[cubic-bezier(0.25,1,0.5,1)] p-4 sm:p-5 rounded-2xl border border-transparent hover:border-neutral-100 hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.05)] hover:bg-neutral-50/50 hover:-translate-y-1 ${isRemoving ? 'opacity-0 scale-95 max-h-0 -mb-6' : 'opacity-100 scale-100 max-h-[300px]'}`}
     >
-      <div className="flex gap-5 sm:gap-7">
+      <div className="flex flex-col sm:flex-row sm:items-center gap-5 w-full">
+        {/* Product Area */}
+        <div className="flex-1 flex gap-5 sm:gap-7 min-w-0">
         {/* Image */}
         <div 
-          className="relative w-[100px] h-[130px] sm:w-[130px] sm:h-[165px] bg-neutral-100 rounded-lg overflow-hidden shrink-0"
+          className="relative w-[100px] h-[130px] sm:w-[130px] sm:h-[165px] bg-neutral-100 rounded-xl overflow-hidden shrink-0 shadow-sm"
           onMouseEnter={() => setHovered(true)}
           onMouseLeave={() => setHovered(false)}
         >
@@ -187,62 +189,79 @@ const CartItem = ({ item, onRemove, onUpdateQuantity, removingId }) => {
           <div>
             <div className="flex items-start justify-between gap-2">
               <div className="min-w-0">
-                <h3 className="text-sm font-semibold text-neutral-900 uppercase tracking-[0.08em] truncate">
+                <h3 className="text-sm font-semibold text-neutral-900 uppercase tracking-[0.08em] truncate group-hover:text-neutral-700 transition-colors">
                   {item.product?.title}
                 </h3>
                 {variantLabel && (
-                  <p className="text-[10px] text-neutral-400 mt-1 uppercase tracking-[0.15em] font-medium">
-                    {variantLabel}
-                  </p>
+                  <div className="mt-2.5 inline-block bg-[#d4af8a]/15 border border-[#d4af8a]/30 px-2.5 py-1 rounded-md shadow-sm">
+                    <p className="text-[10px] text-[#a6825c] uppercase tracking-[0.15em] font-bold">
+                      {variantLabel}
+                    </p>
+                  </div>
                 )}
               </div>
-              <button
-                onClick={() => onRemove(item._id)}
-                className="p-1.5 text-neutral-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all duration-200 shrink-0"
-                title="Remove item"
-              >
-                <TrashIcon />
-              </button>
-            </div>
+                <button
+                  onClick={() => onRemove(item._id)}
+                  className="sm:hidden p-1.5 text-neutral-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all duration-200 shrink-0"
+                  title="Remove item"
+                >
+                  <TrashIcon />
+                </button>
+              </div>
 
-            <div className="mt-2 flex items-center gap-2.5">
-              <span className="text-sm font-medium text-neutral-700">
-                {formatPrice(price, currency)}
-              </span>
-              {stock != null && stock > 0 && stock <= 5 && (
-                <span className="text-[9px] font-semibold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full uppercase tracking-wider">
-                  Only {stock} left
+              <div className="mt-2 flex items-center gap-2.5">
+                <span className="text-sm font-medium text-neutral-700">
+                  {formatPrice(price, currency)}
                 </span>
-              )}
-              {stock === 0 && (
-                <span className="text-[9px] font-semibold text-red-600 bg-red-50 px-2 py-0.5 rounded-full uppercase tracking-wider">
-                  Out of stock
-                </span>
-              )}
+                {stock != null && stock > 0 && stock <= 5 && (
+                  <span className="text-[9px] font-semibold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full uppercase tracking-wider">
+                    Only {stock} left
+                  </span>
+                )}
+                {stock === 0 && (
+                  <span className="text-[9px] font-semibold text-red-600 bg-red-50 px-2 py-0.5 rounded-full uppercase tracking-wider">
+                    Out of stock
+                  </span>
+                )}
+              </div>
             </div>
+            
+            {/* Desktop Remove Button */}
+            <button
+              onClick={() => onRemove(item._id)}
+              className="hidden sm:flex items-center gap-1.5 w-fit mt-auto pt-3 text-[10px] font-bold uppercase tracking-widest text-neutral-400 hover:text-red-500 transition-colors"
+            >
+              <TrashIcon />
+              <span>Remove</span>
+            </button>
           </div>
+        </div>
 
-          {/* Quantity + Line Total */}
-          <div className="flex items-center justify-between mt-3">
+        {/* Quantity + Line Total */}
+        <div className="flex items-center justify-between sm:justify-start w-full sm:w-auto mt-1 sm:mt-0">
+          <div className="sm:w-28 flex sm:justify-center shrink-0">
             <div className="flex items-center gap-0 border border-neutral-200 rounded-lg overflow-hidden bg-white">
               <button
                 onClick={() => onUpdateQuantity(item._id, Math.max(1, item.quantity - 1))}
                 disabled={item.quantity <= 1}
-                className="w-8 h-8 flex items-center justify-center text-neutral-500 hover:bg-neutral-50 hover:text-neutral-900 transition-colors disabled:opacity-25 disabled:cursor-not-allowed"
+                className="w-8 h-8 flex items-center justify-center text-neutral-500 hover:bg-neutral-100 hover:text-neutral-900 transition-colors disabled:opacity-25 disabled:cursor-not-allowed"
               >
                 <MinusIcon />
               </button>
-              <span className="w-9 h-8 flex items-center justify-center text-xs font-semibold text-neutral-900 border-x border-neutral-200">
+              <span className="w-9 h-8 flex items-center justify-center text-xs font-semibold text-neutral-900 border-x border-neutral-200 bg-neutral-50/50">
                 {item.quantity}
               </span>
               <button
                 onClick={() => onUpdateQuantity(item._id, item.quantity + 1)}
                 disabled={stock != null && item.quantity >= stock}
-                className="w-8 h-8 flex items-center justify-center text-neutral-500 hover:bg-neutral-50 hover:text-neutral-900 transition-colors disabled:opacity-25 disabled:cursor-not-allowed"
+                className="w-8 h-8 flex items-center justify-center text-neutral-500 hover:bg-neutral-100 hover:text-neutral-900 transition-colors disabled:opacity-25 disabled:cursor-not-allowed"
               >
                 <PlusIcon />
               </button>
             </div>
+          </div>
+          
+          <div className="sm:w-24 text-right shrink-0">
             <span className="text-sm font-bold text-neutral-900 tracking-tight">
               {formatPrice(lineTotal, currency)}
             </span>
@@ -291,7 +310,7 @@ const OrderSummary = ({ items, navigate }) => {
   return (
     <div className="lg:sticky lg:top-24">
       {/* Summary Card */}
-      <div className="bg-neutral-50 rounded-xl p-6 sm:p-8">
+      <div className="bg-neutral-50/80 backdrop-blur-md border border-transparent hover:border-neutral-900 rounded-2xl p-6 sm:p-8 transition-all duration-500 ease-out hover:shadow-[0_30px_60px_-15px_rgba(0,0,0,0.1)] hover:-translate-y-1">
         <h2 className="text-[11px] font-semibold uppercase tracking-[0.25em] text-neutral-400 mb-8">
           Order Summary
         </h2>
@@ -311,7 +330,7 @@ const OrderSummary = ({ items, navigate }) => {
           </div>
           
           {shipping > 0 && (
-            <div className="bg-white rounded-lg px-4 py-3.5 border border-dashed border-neutral-200/80">
+            <div className="bg-white rounded-xl px-4 py-3.5 border border-dashed border-neutral-200/80 transition-colors hover:border-neutral-400">
               <p className="text-xs text-neutral-400 leading-relaxed">
                 Add <span className="font-bold text-neutral-900">{formatPrice(1000 - subtotal, currency)}</span> more for <span className="font-bold text-emerald-600">free shipping</span>
               </p>
@@ -333,15 +352,16 @@ const OrderSummary = ({ items, navigate }) => {
         </div>
 
         <button
-          className="w-full bg-neutral-900 text-white py-4 rounded-lg font-semibold text-xs uppercase tracking-[0.2em] hover:bg-neutral-800 transition-all shadow-lg shadow-neutral-900/10 hover:-translate-y-0.5 transform duration-200 flex items-center justify-center gap-2"
+          className="relative w-full bg-neutral-900 text-white py-4 rounded-xl font-semibold text-xs uppercase tracking-[0.2em] transition-all duration-300 hover:shadow-[0_15px_30px_-5px_rgba(0,0,0,0.3)] hover:-translate-y-1 overflow-hidden group flex items-center justify-center gap-2"
         >
+          <span className="absolute inset-0 w-full h-full bg-white/10 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out"></span>
           <LockIcon />
-          Secure Checkout
+          <span>Secure Checkout</span>
         </button>
 
         <button
           onClick={() => navigate("/")}
-          className="w-full mt-3 bg-white text-neutral-700 py-3.5 rounded-lg font-semibold text-xs uppercase tracking-[0.15em] border border-neutral-200 hover:border-neutral-400 hover:text-neutral-900 transition-all"
+          className="w-full mt-3 bg-white text-neutral-900 py-3.5 rounded-xl font-semibold text-xs uppercase tracking-[0.15em] border border-neutral-200 hover:border-neutral-900 hover:bg-neutral-50 transition-all duration-300 hover:shadow-md hover:-translate-y-0.5"
         >
           Continue Shopping
         </button>
@@ -458,21 +478,20 @@ const Cart = () => {
             <div className="flex-1 min-w-0">
               {/* Column Headers - Desktop */}
               <div className="hidden sm:flex items-center text-[9px] font-semibold uppercase tracking-[0.25em] text-neutral-300 pb-4 border-b border-neutral-100 mb-2">
-                <span className="flex-1">Product</span>
+                <span className="flex-1">Products</span>
                 <span className="w-28 text-center">Quantity</span>
                 <span className="w-24 text-right">Total</span>
               </div>
               
-              <div className="divide-y divide-neutral-100/80">
+              <div className="flex flex-col gap-2 mt-2">
                 {cartItems.map((item) => (
-                  <div key={item._id} className="py-6 first:pt-4">
-                    <CartItem
-                      item={item}
-                      onRemove={onRemove}
-                      onUpdateQuantity={onUpdateQuantity}
-                      removingId={removingId}
-                    />
-                  </div>
+                  <CartItem
+                    key={item._id}
+                    item={item}
+                    onRemove={onRemove}
+                    onUpdateQuantity={onUpdateQuantity}
+                    removingId={removingId}
+                  />
                 ))}
               </div>
             </div>

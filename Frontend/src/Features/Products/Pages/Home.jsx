@@ -87,10 +87,10 @@ const ProductCard = ({ product, onClick, onQuickAdd }) => {
       onClick={onClick}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
-      className="group cursor-pointer flex flex-col transition-transform duration-300 hover:-translate-y-1"
+      className="group cursor-pointer flex flex-col p-4 rounded-2xl transition-all duration-500 ease-[cubic-bezier(0.25,1,0.5,1)] hover:bg-white hover:shadow-[0_30px_60px_-15px_rgba(0,0,0,0.08)] hover:-translate-y-2 border border-transparent hover:border-neutral-100/80"
     >
       {/* Image Container */}
-      <div className="relative aspect-[3/4] bg-neutral-100 overflow-hidden rounded-md shadow-sm">
+      <div className="relative aspect-[3/4] bg-neutral-100 overflow-hidden rounded-xl shadow-[0_2px_10px_-4px_rgba(0,0,0,0.1)]">
         {images.length > 0 ? (
           <img
             src={images[imgIdx]?.url}
@@ -130,12 +130,12 @@ const ProductCard = ({ product, onClick, onQuickAdd }) => {
       </div>
 
       {/* Info */}
-      <div className="pt-5 flex flex-col gap-2">
-        <div className="flex justify-between items-center gap-2">
-          <h3 className="text-sm font-semibold text-neutral-900 truncate uppercase tracking-[0.1em]">
+      <div className="pt-6 pb-2 px-1 flex flex-col gap-2">
+        <div className="flex justify-between items-center gap-3">
+          <h3 className="text-sm font-bold text-neutral-900 truncate uppercase tracking-[0.1em] group-hover:text-neutral-700 transition-colors">
             {product.title}
           </h3>
-          <span className="text-sm font-bold text-neutral-900 shrink-0">
+          <span className="text-sm font-bold text-neutral-900 shrink-0 bg-neutral-50 px-2 py-1 rounded-md group-hover:bg-neutral-100 transition-colors">
             {formatted}
           </span>
         </div>
@@ -351,7 +351,7 @@ const Home = () => {
               <p className="text-neutral-500 text-sm">Try adjusting your search criteria.</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-8 gap-y-16">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-10 gap-y-12">
               {filtered.map(product => (
                 <ProductCard
                   key={product._id}
