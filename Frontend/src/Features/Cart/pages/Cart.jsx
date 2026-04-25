@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 import { useCart } from '../Hook/useCart'
 import { useNavigate } from 'react-router'
+import Footer from '../../shared/Footer'
 
 /* ── Icons ── */
 const BackIcon = () => (
@@ -475,16 +476,7 @@ const Cart = () => {
       </div>
 
       {/* Footer */}
-      <footer className="bg-neutral-50 border-t border-neutral-100 mt-8">
-        <div className="max-w-7xl mx-auto px-6 sm:px-10 py-12 flex flex-col md:flex-row justify-between items-center gap-4">
-          <span className="font-serif font-bold text-xl tracking-[-0.02em] text-neutral-900">
-            VEXTO
-          </span>
-          <p className="text-[10px] text-neutral-400 tracking-[0.2em] uppercase">
-            © 2026 VEXTO. All rights reserved.
-          </p>
-        </div>
-      </footer>
+      <Footer />
     </div>
   )
 }

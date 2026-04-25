@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useProduct } from '../hook/useProduct';
 import { useNavigate, useParams } from 'react-router';
+import Footer from '../../shared/Footer';
 
 const SellerProductDetails = () => {
     const { handleGetProductById, handleCreateProductVariant, handleUpdateVariantStock } = useProduct();
@@ -93,8 +94,9 @@ const SellerProductDetails = () => {
     }
 
     return (
-        <div className="min-h-screen bg-gray-50 p-8">
-            <div className="max-w-6xl mx-auto space-y-12">
+        <div className="min-h-screen bg-gray-50 flex flex-col">
+            <div className="flex-1 p-8">
+                <div className="max-w-6xl mx-auto space-y-12">
                 {/* Product Overview */}
                 <div className="bg-white border border-gray-200 p-8 rounded-2xl flex gap-8 shadow-sm">
                     <div className="w-1/3">
@@ -217,6 +219,8 @@ const SellerProductDetails = () => {
                     </div>
                 </div>
             </div>
+            </div>
+            <Footer />
         </div>
     );
 };

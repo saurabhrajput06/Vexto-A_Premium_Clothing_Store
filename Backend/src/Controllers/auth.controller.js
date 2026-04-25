@@ -23,8 +23,6 @@ res.cookie("token",token)
         }
     })
     
-    await sendTokenResponse(user,res , "User registered successfully");
-
 }
 
 

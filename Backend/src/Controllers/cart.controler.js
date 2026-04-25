@@ -7,72 +7,83 @@ import { stockOfVariantInProduct } from "../Dao/product.dao.js";
 export const addToCart = async (req, res) => {
     //fetch the product and variant from the database 
     try {
-        const { productId, variantId } = req.params
-        const { quantity = 1 } = req.body
+        let { productId, variantId } = req.params;
+        const { quantity = 1 } = req.body;
 
         const product = variantId
             ? await productModel.findOne({ _id: productId, "variants._id": variantId })
-            : await productModel.findById(productId)
+            : await productModel.findById(productId);
 
         if (!product) {
-            return res.status(404).json({ message: "Product or variant not found", success: false })
+            return res.status(404).json({ message: "Product or variant not found", success: false });
+        }
+
+        // If no variantId is provided, but the product has variants, default to the first one
+        if (!variantId && product.variants && product.variants.length > 0) {
+            variantId = product.variants[0]._id.toString();
         }
 
         // to find or create a cart for user
         const cart = (await cartModel.findOne({ user: req.user._id })) ||
-            await cartModel.create({ user: req.user._id })
-
+            await cartModel.create({ user: req.user._id });
 
         // Get stock for this variant (or total product stock if no variant)
         const stock = variantId
             ? await stockOfVariantInProduct(productId, variantId)
-            : product.stock ?? Infinity
+            : product.stock ?? Infinity;
 
         const isProductAlreadyInCart = cart.items.some(
             item => item.product.toString() === productId &&
-                    (variantId ? item.variant?.toString() === variantId : !item.variant))
+                    (variantId ? item.variant?.toString() === variantId : !item.variant));
 
         if (isProductAlreadyInCart) {
             const quantityInCart = cart.items.find(
                 item => item.product.toString() === productId &&
                         (variantId ? item.variant?.toString() === variantId : !item.variant)
-            )?.quantity
+            )?.quantity;
+            
             if (quantityInCart + quantity > stock) {
                 return res.status(400).json({
                     success: false,
                     message: `Only ${stock} are available in stock. and you have already ${quantityInCart} in your cart`
-                })
+                });
             }
+            
             const filter = variantId
                 ? { user: req.user._id, "items.product": productId, "items.variant": variantId }
-                : { user: req.user._id, "items.product": productId, "items.variant": null }
+                : { user: req.user._id, "items.product": productId, "items.variant": null };
+                
             await cartModel.findOneAndUpdate(
                 filter,
                 { $inc: { "items.$.quantity": quantity } },
                 { new: true }
-            )
+            );
+            
             return res.status(200).json({
                 message: "Cart updated successfully",
                 success: true
-            })
+            });
         }
+        
         if (quantity > stock) {
             return res.status(400).json({
                 success: false,
                 message: `Only ${stock} are available in stock.`
-            })
+            });
         }
 
         cart.items.push({
             product: productId,
             variant: variantId || null,
             quantity: quantity
-        })
-        await cart.save()
+        });
+        
+        await cart.save();
+        
         return res.status(200).json({
             message: "Item added to cart successfully",
-            success: true
-        })
+            success: true,
+        });
 
     }
 

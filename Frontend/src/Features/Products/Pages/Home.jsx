@@ -4,6 +4,7 @@ import { useSelector } from "react-redux";
 import { useNavigate } from "react-router";
 import { useAuth } from "../../Auth/Hook/UseAuth";
 import { useCart } from "../../Cart/Hook/useCart";
+import Footer from "../../shared/Footer";
 
 /* ── Icons ── */
 const SearchIcon = () => (
@@ -139,8 +140,8 @@ const ProductCard = ({ product, onClick, onQuickAdd }) => {
           </span>
         </div>
         <div className="flex justify-between items-center text-[10px] text-neutral-400 uppercase tracking-[0.2em] font-medium mt-0.5">
-          <span>{product.category || "VINTAGE"}</span>
-          <span>{product.brand || "SNITCH"}</span>
+          <span>{product.category || ""}</span>
+          <span>{product.brand || ""}</span>
         </div>
       </div>
     </div>
@@ -221,18 +222,28 @@ const Navbar = ({ navigate, user, cartCount }) => {
 
 /* ── Hero ── */
 const Hero = () => (
-  <div className="relative py-28 sm:py-36 px-6 sm:px-10 text-center overflow-hidden bg-neutral-50">
-    <div className="max-w-4xl mx-auto flex flex-col items-center">
-      <p className="text-[11px] font-semibold tracking-[0.3em] uppercase text-neutral-400 mb-8">
+  <div className="relative py-36 sm:py-48 px-6 sm:px-10 text-center overflow-hidden">
+    {/* Background Image */}
+    <div 
+      className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+      style={{ backgroundImage: "url('/clothes_rack.png')" }}
+    ></div>
+    
+    {/* Dark Overlay for readability */}
+    <div className="absolute inset-0 bg-black/40"></div>
+
+    {/* Content */}
+    <div className="relative z-10 max-w-4xl mx-auto flex flex-col items-center">
+      <p className="text-[11px] font-semibold tracking-[0.3em] uppercase text-white/80 mb-8">
         New Arrivals
       </p>
-      <h1 className="font-serif font-medium text-5xl sm:text-7xl text-black leading-tight tracking-[-0.02em] mb-12">
+      <h1 className="font-serif font-medium text-5xl sm:text-7xl text-white leading-tight tracking-[-0.02em] mb-12 drop-shadow-lg">
         The Edit.
       </h1>
-      <p className="text-base sm:text-lg text-neutral-500 max-w-xl leading-relaxed mb-14 font-normal">
+      <p className="text-base sm:text-lg text-white/90 max-w-xl leading-relaxed mb-14 font-normal drop-shadow-md">
         Discover our curated selection of premium pieces. Designed for the modern minimalist, crafted with uncompromising quality.
       </p>
-      <button className="text-xs font-semibold bg-neutral-900 text-white px-10 py-4 rounded-md hover:bg-neutral-800 transition-all uppercase tracking-[0.2em] shadow-lg hover:-translate-y-0.5 transform duration-200">
+      <button className="text-xs font-semibold bg-white text-black px-10 py-4 rounded-md hover:bg-neutral-200 transition-all uppercase tracking-[0.2em] shadow-xl hover:-translate-y-0.5 transform duration-200">
         Shop Collection
       </button>
     </div>
@@ -364,16 +375,7 @@ const Home = () => {
       </div>
 
       {/* Footer */}
-      <footer className="bg-neutral-50 border-t border-neutral-200 mt-20">
-        <div className="max-w-7xl mx-auto px-6 sm:px-10 py-16 flex flex-col md:flex-row justify-between items-center gap-6">
-          <span className="font-serif font-bold text-xl tracking-[-0.02em] text-neutral-900">
-            VEXTO
-          </span>
-          <p className="text-[10px] text-neutral-400 tracking-[0.2em] uppercase">
-            © 2026 VEXTO. All rights reserved.
-          </p>
-        </div>
-      </footer>
+      <Footer />
 
       {/* Toast */}
       <Toast show={toastShow} message={toastMessage} onClose={() => setToastShow(false)} />

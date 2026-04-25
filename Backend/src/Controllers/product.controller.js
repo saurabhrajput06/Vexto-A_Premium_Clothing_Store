@@ -15,15 +15,24 @@ export async function createProduct(req , res){
                 folder:"Vexto"
             })
         }))
-        const product =await productModel.create({
+        const product = await productModel.create({
             title,
             description,
-            price:{
-                amount:priceAmount,
-                currency:priceCurrency||"INR"
+            price: {
+                amount: priceAmount,
+                currency: priceCurrency || "INR"
             },
-            seller:seller._id,
-            images
+            seller: seller._id,
+            images,
+            variants: [{
+                images,
+                stock: 0,
+                price: {
+                    amount: priceAmount,
+                    currency: priceCurrency || "INR"
+                },
+                attributes: { type: "Standard" }
+            }]
         })
         return res.status(201).json({message:"Product created successfully",product})
     }

@@ -14,7 +14,7 @@ function App() {
   },[])
 
   useEffect(() => {
-    console.log("user:", user, "| loading:", loading);
+    console.log("user:", user, "| Loading:", loading);
   },[user, loading])
 
   return (

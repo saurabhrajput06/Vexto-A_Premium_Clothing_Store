@@ -1,6 +1,7 @@
 import { createBrowserRouter, Outlet } from "react-router";
 import Register from "../Features/Auth/pages/Register";
 import Login from "../Features/Auth/pages/Login";
+import RootPage from "./RootPage";
 import CreateProduct from "../Features/Products/Pages/CreateProduct";
 import Dashboard from "../Features/Products/Pages/Dashboard";
 import Cart from "../Features/Cart/pages/Cart";
@@ -13,6 +14,10 @@ import SellerProductDetails from "../Features/Products/Pages/SellerProductDetail
 export const router = createBrowserRouter([
     {
         path: "/",
+        element: <RootPage />
+    },
+    {
+        path: "/home",
         element: <Home />
     },
     {

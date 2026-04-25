@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router";
 import { useSelector } from "react-redux";
 import { useProduct } from "../hook/useProduct";
 import { useCart } from "../../Cart/Hook/useCart";
+import Footer from "../../shared/Footer";
 
 
 /* ── Icons ── */
@@ -366,6 +367,8 @@ const ProductDetails = () => {
         type={toastType}
         onClose={() => setToastShow(false)}
       />
+
+      <Footer />
     </div>
   );
 };

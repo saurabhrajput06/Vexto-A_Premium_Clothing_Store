@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useProduct } from "../hook/useProduct";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router";
+import Footer from "../../shared/Footer";
 
 /* ------------------------------------------------------------------ */
 /*  SVG Icons                                                           */
@@ -260,6 +261,7 @@ const Dashboard = () => {
           </div>
         )}
       </div>
+      <Footer />
     </div>
   );
 };

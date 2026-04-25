@@ -28,11 +28,11 @@ const Login = () => {
         password: formData.password
       });
 
-      if (user.role == "buyer") {
-        navigate("/");
-      }
-      else if (user.role == "seller") {
+      // Redirect to home after successful login
+      if (user?.role === "seller") {
         navigate("/seller/dashboard");
+      } else {
+        navigate("/home");
       }
     } catch (error) {
       console.error("Login Error:", error);

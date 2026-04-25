@@ -1,6 +1,7 @@
 import { useState, useRef } from "react";
 import { useNavigate } from "react-router";
 import { useProduct } from "../hook/useProduct";
+import Footer from "../../shared/Footer";
 
 /* ------------------------------------------------------------------ */
 /*  Tiny SVG icon helpers                                               */
@@ -482,6 +483,7 @@ const CreateProduct = () => {
 
         <div className="h-24" />
       </div>
+      <Footer />
     </div>
   );
 };
