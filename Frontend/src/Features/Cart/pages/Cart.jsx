@@ -74,7 +74,14 @@ const formatPrice = (amount, currency = "INR") => {
 
 const getVariantData = (item) => {
   if (!item.variant || !item.product?.variants) return null;
-  return item.product.variants.find(v => v._id === item.variant);
+  if (Array.isArray(item.product.variants)) {
+    return item.product.variants.find(v => v._id === item.variant);
+  }
+  // When using aggregation pipeline, variants might already be an unwound object
+  if (item.product.variants._id === item.variant) {
+    return item.product.variants;
+  }
+  return item.product.variants;
 };
 
 const getItemImages = (item) => {
@@ -125,6 +132,8 @@ const CartItem = ({ item, onRemove, onUpdateQuantity, removingId }) => {
   const prev = (e) => { e.stopPropagation(); setImgIdx(i => (i === 0 ? images.length - 1 : i - 1)); };
   const next = (e) => { e.stopPropagation(); setImgIdx(i => (i === images.length - 1 ? 0 : i + 1)); };
 
+
+  // console.log(item)
   return (
     <div
       className={`group transition-all duration-500 ease-out ${isRemoving ? 'opacity-0 scale-95 max-h-0 -mb-6' : 'opacity-100 scale-100 max-h-[300px]'}`}
@@ -243,6 +252,8 @@ const CartItem = ({ item, onRemove, onUpdateQuantity, removingId }) => {
     </div>
   );
 };
+
+
 
 
 /* ── Empty Cart ── */
