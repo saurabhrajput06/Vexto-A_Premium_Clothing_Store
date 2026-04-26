@@ -5,6 +5,7 @@ import { useNavigate } from "react-router";
 import { useAuth } from "../../Auth/Hook/UseAuth";
 import { useCart } from "../../Cart/Hook/useCart";
 import Footer from "../../shared/Footer";
+import Navbar from "../../shared/Navbar";
 
 /* ── Icons ── */
 const SearchIcon = () => (
@@ -90,7 +91,7 @@ const ProductCard = ({ product, onClick, onQuickAdd }) => {
       className="group cursor-pointer flex flex-col p-4 rounded-2xl transition-all duration-500 ease-[cubic-bezier(0.25,1,0.5,1)] hover:bg-white hover:shadow-[0_30px_60px_-15px_rgba(0,0,0,0.08)] hover:-translate-y-2 border border-transparent hover:border-neutral-100/80"
     >
       {/* Image Container */}
-      <div className="relative aspect-[3/4] bg-neutral-100 overflow-hidden rounded-xl shadow-[0_2px_10px_-4px_rgba(0,0,0,0.1)]">
+      <div className="relative aspect-[7/10] bg-neutral-100 overflow-hidden squre-xl shadow-[0_2px_10px_-4px_rgba(0,0,0,0.1)]">
         {images.length > 0 ? (
           <img
             src={images[imgIdx]?.url}
@@ -148,87 +149,17 @@ const ProductCard = ({ product, onClick, onQuickAdd }) => {
   );
 };
 
-/* ── Navbar ── */
-const Navbar = ({ navigate, user, cartCount }) => {
-  const [dropdownOpen, setDropdownOpen] = useState(false);
-  const { handleLogout } = useAuth();
 
-  const onLogout = async () => {
-    await handleLogout();
-    navigate("/login");
-  };
-
-  return (
-    <nav className="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-neutral-200/60 px-6 sm:px-10">
-      <div className="max-w-7xl mx-auto h-20 flex items-center justify-between">
-        <span
-          onClick={() => navigate("/")}
-          className="font-serif font-bold text-3xl tracking-[-0.02em] text-black cursor-pointer"
-        >
-          VEXTO
-        </span>
-        <div className="flex items-center gap-5">
-          <button className="text-neutral-500 hover:text-black transition-colors hidden sm:block">
-            <SearchIcon />
-          </button>
-
-          {/* Cart Icon */}
-          <button
-            onClick={() => navigate("/cart")}
-            className="relative text-neutral-500 hover:text-black transition-colors"
-          >
-            <CartIcon />
-            {cartCount > 0 && (
-              <span className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-neutral-900 text-white text-[9px] font-bold rounded-full flex items-center justify-center leading-none">
-                {cartCount > 9 ? "9+" : cartCount}
-              </span>
-            )}
-          </button>
-
-          {user ? (
-            <div className="relative">
-              <button
-                onClick={() => setDropdownOpen(!dropdownOpen)}
-                className="flex items-center gap-2 text-sm font-medium text-neutral-600 hover:text-neutral-900 transition-colors"
-              >
-                <UserIcon />
-                <span className="hidden sm:inline">{user.fullname || "Account"}</span>
-              </button>
-
-              {dropdownOpen && (
-                <div className="absolute right-0 mt-4 w-48 bg-white border border-neutral-100 shadow-xl rounded-md py-2">
-                  <div className="px-4 py-2 text-xs text-neutral-400 border-b border-neutral-100 mb-2">Signed in as {user.email}</div>
-                  <button onClick={onLogout} className="w-full text-left px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-50 hover:text-neutral-900 transition-colors">
-                    Log out
-                  </button>
-                </div>
-              )}
-            </div>
-          ) : (
-            <div className="flex items-center gap-4">
-              <button onClick={() => navigate("/login")} className="text-sm font-medium text-neutral-500 hover:text-neutral-900 transition-colors">
-                Log in
-              </button>
-              <button onClick={() => navigate("/register")} className="text-sm font-medium bg-neutral-900 text-white px-5 py-2.5 rounded-md hover:bg-neutral-800 transition-colors">
-                Sign up
-              </button>
-            </div>
-          )}
-        </div>
-      </div>
-    </nav>
-  );
-};
 
 /* ── Hero ── */
 const Hero = () => (
-  <div className="relative py-36 sm:py-48 px-6 sm:px-10 text-center overflow-hidden">
+  <div className="relative pt-44 pb-36 sm:pt-56 sm:pb-48 px-6 sm:px-10 text-center overflow-hidden -mt-16">
     {/* Background Image */}
-    <div 
+    <div
       className="absolute inset-0 bg-cover bg-center bg-no-repeat"
       style={{ backgroundImage: "url('/clothes_rack.png')" }}
     ></div>
-    
+
     {/* Dark Overlay for readability */}
     <div className="absolute inset-0 bg-black/40"></div>
 
@@ -299,7 +230,7 @@ const Home = () => {
 
   return (
     <div className="min-h-screen bg-white font-sans text-neutral-900 selection:bg-neutral-200">
-      <Navbar navigate={navigate} user={user} cartCount={cartCount} />
+      <Navbar />
       <Hero />
 
       {/* Main Content Area */}
@@ -351,7 +282,7 @@ const Home = () => {
               <p className="text-neutral-500 text-sm">Try adjusting your search criteria.</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-10 gap-y-12">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-10 gap-y-12">
               {filtered.map(product => (
                 <ProductCard
                   key={product._id}

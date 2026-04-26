@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux'
 import { useCart } from '../Hook/useCart'
 import { useNavigate } from 'react-router'
 import Footer from '../../shared/Footer'
+import Navbar from '../../shared/Navbar'
 
 /* ── Icons ── */
 const BackIcon = () => (
@@ -431,23 +432,7 @@ const Cart = () => {
     <div className="min-h-screen bg-white font-sans text-neutral-900 selection:bg-neutral-200">
 
       {/* Navbar */}
-      <nav className="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-neutral-100 px-6 sm:px-10">
-        <div className="max-w-7xl mx-auto h-16 flex items-center justify-between">
-          <button
-            onClick={() => navigate(-1)}
-            className="flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-neutral-400 hover:text-neutral-900 transition-colors"
-          >
-            <BackIcon /> Back
-          </button>
-          <span
-            onClick={() => navigate("/")}
-            className="font-serif font-bold text-xl tracking-[-0.02em] text-black cursor-pointer"
-          >
-            VEXTO
-          </span>
-          <div className="w-16" />
-        </div>
-      </nav>
+      <Navbar />
 
       <div className="max-w-7xl mx-auto px-6 sm:px-10 pt-12 pb-24">
 

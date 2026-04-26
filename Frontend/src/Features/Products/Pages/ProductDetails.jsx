@@ -4,6 +4,7 @@ import { useSelector } from "react-redux";
 import { useProduct } from "../hook/useProduct";
 import { useCart } from "../../Cart/Hook/useCart";
 import Footer from "../../shared/Footer";
+import Navbar from "../../shared/Navbar";
 
 
 /* ── Icons ── */
@@ -182,26 +183,7 @@ const ProductDetails = () => {
   return (
     <div className="min-h-screen bg-white font-sans text-neutral-900 selection:bg-neutral-200">
       {/* Navbar Minimal */}
-      <nav className="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-neutral-100 px-6 sm:px-10 h-16 flex items-center justify-between">
-        <button
-          onClick={() => navigate(-1)}
-          className="flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-neutral-400 hover:text-neutral-900 transition-colors"
-        >
-          <BackIcon /> Back
-        </button>
-        <span
-          onClick={() => navigate("/")}
-          className="font-serif font-bold text-xl tracking-[-0.02em] text-black cursor-pointer"
-        >
-          VEXTO
-        </span>
-        <button
-          onClick={() => navigate("/cart")}
-          className="text-neutral-400 hover:text-neutral-900 transition-colors"
-        >
-          <CartIcon />
-        </button>
-      </nav>
+      <Navbar />
 
       <div className="max-w-[1440px] mx-auto px-6 sm:px-10 pt-16 pb-24 lg:pt-28 lg:pb-32">
         <div className="flex flex-col lg:flex-row gap-16 xl:gap-24">
