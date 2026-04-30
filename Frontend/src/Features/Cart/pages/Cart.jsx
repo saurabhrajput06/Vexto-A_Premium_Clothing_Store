@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router'
 import Footer from '../../shared/Footer'
 import Navbar from '../../shared/Navbar'
 
+
 /* ── Icons ── */
 const BackIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
@@ -307,7 +308,14 @@ const OrderSummary = ({ items, navigate }) => {
   const total = subtotal + shipping;
   const itemCount = items.reduce((sum, item) => sum + item.quantity, 0);
   const shippingProgress = Math.min(100, (subtotal / 1000) * 100);
-
+  
+  
+  const {handlePayment} = useCart()
+  async function handleCheckout() {
+    const order = await handlePayment()
+    console.log("order is",order)
+    // navigate("/checkout", { state: { order } })
+  }
   return (
     <div className="lg:sticky lg:top-24">
       {/* Summary Card */}
@@ -354,6 +362,7 @@ const OrderSummary = ({ items, navigate }) => {
 
         <button
           className="relative w-full bg-neutral-900 text-white py-4 rounded-xl font-semibold text-xs uppercase tracking-[0.2em] transition-all duration-300 hover:shadow-[0_15px_30px_-5px_rgba(0,0,0,0.3)] hover:-translate-y-1 overflow-hidden group flex items-center justify-center gap-2"
+          onClick={handleCheckout}
         >
           <span className="absolute inset-0 w-full h-full bg-white/10 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out"></span>
           <LockIcon />
@@ -395,7 +404,7 @@ const Cart = () => {
   const cartItems = useSelector(state => state.cart.items)
   const cartLoading = useSelector(state => state.cart.loading)
   const navigate = useNavigate()
-  const { handleGetCart, handleRemoveItem, handleUpdateQuantity } = useCart()
+  const { handleGetCart, handleRemoveItem, handleUpdateQuantity,handlePayment } = useCart()
   const [removingId, setRemovingId] = useState(null)
 
   useEffect(() => {
@@ -413,6 +422,8 @@ const Cart = () => {
   const onUpdateQuantity = (itemId, quantity) => {
     handleUpdateQuantity(itemId, quantity)
   }
+
+
 
   // Loading state
   if (cartLoading && (!cartItems || cartItems.length === 0)) {

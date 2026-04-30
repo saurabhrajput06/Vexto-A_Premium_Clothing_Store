@@ -5,6 +5,7 @@ import { stockOfVariantInProduct } from "../Dao/product.dao.js";
 import mongoose from "mongoose";
 
 
+
 export const addToCart = async (req, res) => {
     //fetch the product and variant from the database 
     try {
@@ -35,37 +36,37 @@ export const addToCart = async (req, res) => {
 
         const isProductAlreadyInCart = cart.items.some(
             item => item.product.toString() === productId &&
-                    (variantId ? item.variant?.toString() === variantId : !item.variant));
+                (variantId ? item.variant?.toString() === variantId : !item.variant));
 
         if (isProductAlreadyInCart) {
             const quantityInCart = cart.items.find(
                 item => item.product.toString() === productId &&
-                        (variantId ? item.variant?.toString() === variantId : !item.variant)
+                    (variantId ? item.variant?.toString() === variantId : !item.variant)
             )?.quantity;
-            
+
             if (quantityInCart + quantity > stock) {
                 return res.status(400).json({
                     success: false,
                     message: `Only ${stock} are available in stock. and you have already ${quantityInCart} in your cart`
                 });
             }
-            
+
             const filter = variantId
                 ? { user: req.user._id, "items.product": productId, "items.variant": variantId }
                 : { user: req.user._id, "items.product": productId, "items.variant": null };
-                
+
             await cartModel.findOneAndUpdate(
                 filter,
                 { $inc: { "items.$.quantity": quantity } },
                 { new: true }
             );
-            
+
             return res.status(200).json({
                 message: "Cart updated successfully",
                 success: true
             });
         }
-        
+
         if (quantity > stock) {
             return res.status(400).json({
                 success: false,
@@ -78,9 +79,9 @@ export const addToCart = async (req, res) => {
             variant: variantId || null,
             quantity: quantity
         });
-        
+
         await cart.save();
-        
+
         return res.status(200).json({
             message: "Item added to cart successfully",
             success: true,
@@ -107,7 +108,7 @@ export const getCart = async (req, res) => {
         if (!existingCart) {
             existingCart = await cartModel.create({ user: user._id });
         }
-        
+
         if (!existingCart.items || existingCart.items.length === 0) {
             return res.status(200).json({
                 message: "Cart fetched successfully",
@@ -117,57 +118,57 @@ export const getCart = async (req, res) => {
         }
 
         let cart = await cartModel.aggregate([
-          {
-            $match: {
-              user: new mongoose.Types.ObjectId(user._id)
+            {
+                $match: {
+                    user: new mongoose.Types.ObjectId(user._id)
+                }
+            },
+            { $unwind: { path: '$items' } },
+            {
+                $lookup: {
+                    from: 'products',
+                    localField: 'items.product',
+                    foreignField: '_id',
+                    as: 'items.product'
+                }
+            },
+            { $unwind: { path: '$items.product' } },
+            {
+                $unwind: { path: '$items.product.variants' }
+            },
+            {
+                $match: {
+                    $expr: {
+                        $eq: [
+                            '$items.variant',
+                            '$items.product.variants._id'
+                        ]
+                    }
+                }
+            },
+            {
+                $addFields: {
+                    itemPrice: {
+                        price: {
+                            $multiply: [
+                                '$items.quantity',
+                                '$items.product.variants.price.amount'
+                            ]
+                        },
+                        currency: '$items.product.variants.price.currency'
+                    }
+                }
+            },
+            {
+                $group: {
+                    _id: '$_id',
+                    totalPrice: { $sum: '$itemPrice.price' },
+                    currency: {
+                        $first: '$itemPrice.currency'
+                    },
+                    items: { $push: '$items' }
+                }
             }
-          },
-          { $unwind: { path: '$items' } },
-          {
-            $lookup: {
-              from: 'products',
-              localField: 'items.product',
-              foreignField: '_id',
-              as: 'items.product'
-            }
-          },
-          { $unwind: { path: '$items.product' } },
-          {
-            $unwind: { path: '$items.product.variants' }
-          },
-          {
-            $match: {
-              $expr: {
-                $eq: [
-                  '$items.variant',
-                  '$items.product.variants._id'
-                ]
-              }
-            }
-          },
-          {
-            $addFields: {
-              itemPrice: {
-                price: {
-                  $multiply: [
-                    '$items.quantity',
-                    '$items.product.variants.price.amount'
-                  ]
-                },
-                currency: '$items.product.variants.price.currency'
-              }
-            }
-          },
-          {
-            $group: {
-              _id: '$_id',
-              totalPrice: { $sum: '$itemPrice.price' },
-              currency: {
-                $first: '$itemPrice.currency'
-              },
-              items: { $push: '$items' }
-            }
-          }
         ], { maxTimeMS: 60000, allowDiskUse: true });
 
         // Fallback in case items are filtered out by aggregation matches
@@ -269,5 +270,21 @@ export const updateCartItem = async (req, res) => {
     } catch (error) {
         console.log(error)
         return res.status(500).json({ message: "Internal server error", success: false })
+    }
+}
+
+
+export const createOrder = async (req, res) => {
+    try {
+        const order = await createOrder({ amount: 1000, currency: "INR" })
+
+        return res.status(200).json({
+            message: "Order created successfully",
+            success: true,
+            order
+        })
+    } catch (error) {
+        console.log(error)
+        return res.status(500).json({ message: " error in payments", success: false })
     }
 }

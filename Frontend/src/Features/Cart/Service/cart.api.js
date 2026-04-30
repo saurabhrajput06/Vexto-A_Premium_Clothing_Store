@@ -31,3 +31,9 @@ export const updateItem = async (itemId, quantity) => {
     const response = await cartApiInstance.patch(`/item/${itemId}`, { quantity })
     return response.data;
 }
+
+
+export const createOrder = async ()=>{
+    const response = await cartApiInstance.post("/payment/create-order")
+    return response.data
+}
