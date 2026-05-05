@@ -5,6 +5,7 @@ import RootPage from "./RootPage";
 import CreateProduct from "../Features/Products/Pages/CreateProduct";
 import Dashboard from "../Features/Products/Pages/Dashboard";
 import Cart from "../Features/Cart/pages/Cart";
+import MyAccount from "../Features/Account/pages/MyAccount";
 
 import Protected from "../Features/Auth/components/Protected";
 import Home from "../Features/Products/Pages/Home";
@@ -32,6 +33,12 @@ export const router = createBrowserRouter([
         path: "/cart",
         element : <Protected>
             <Cart />
+        </Protected>
+    },
+    {
+        path: "/account",
+        element: <Protected>
+            <MyAccount />
         </Protected>
     },
     {

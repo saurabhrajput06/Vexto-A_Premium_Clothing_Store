@@ -116,11 +116,29 @@ const Navbar = () => {
               </button>
 
               {dropdownOpen && (
-                <div className="absolute right-0 mt-4 w-48 bg-white border border-neutral-100 shadow-xl rounded-md py-2 z-50">
-                  <div className="px-4 py-2 text-xs text-neutral-400 border-b border-neutral-100 mb-2 truncate">Signed in as {user.email}</div>
-                  <button onClick={onLogout} className="w-full text-left px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-50 hover:text-neutral-900 transition-colors">
-                    Log out
+                <div className="absolute right-0 mt-4 w-52 bg-white border border-neutral-100 shadow-xl rounded-xl py-2 z-50">
+                  <div className="px-4 py-2.5 text-[10px] text-neutral-400 border-b border-neutral-100 mb-1 truncate uppercase tracking-widest font-semibold">
+                    Signed in as {user.email?.split('@')[0]}
+                  </div>
+                  <button
+                    onClick={() => { setDropdownOpen(false); navigate('/account'); }}
+                    className="w-full text-left px-4 py-2.5 text-sm text-neutral-700 hover:bg-neutral-50 hover:text-neutral-900 transition-colors"
+                  >
+                    My Account
                   </button>
+                  {user.role === 'seller' && (
+                    <button
+                      onClick={() => { setDropdownOpen(false); navigate('/seller/dashboard'); }}
+                      className="w-full text-left px-4 py-2.5 text-sm text-neutral-700 hover:bg-neutral-50 hover:text-neutral-900 transition-colors"
+                    >
+                      Seller Dashboard
+                    </button>
+                  )}
+                  <div className="border-t border-neutral-100 mt-1 pt-1">
+                    <button onClick={onLogout} className="w-full text-left px-4 py-2.5 text-sm text-red-500 hover:bg-red-50 transition-colors">
+                      Log out
+                    </button>
+                  </div>
                 </div>
               )}
             </div>
