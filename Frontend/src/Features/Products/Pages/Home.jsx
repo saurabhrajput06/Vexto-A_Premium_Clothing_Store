@@ -4,6 +4,7 @@ import { useSelector } from "react-redux";
 import { useNavigate } from "react-router";
 import { useAuth } from "../../Auth/Hook/UseAuth";
 import { useCart } from "../../Cart/Hook/useCart";
+import { useWishlist } from "../../Wishlist/Hook/useWishlist";
 import Footer from "../../shared/Footer";
 import Navbar from "../../shared/Navbar";
 
@@ -68,11 +69,28 @@ const Toast = ({ show, message, onClose }) => {
 };
 
 /* ── Product Card ── */
-const ProductCard = ({ product, onClick, onQuickAdd }) => {
+const ProductCard = ({ product, onClick, onQuickAdd, isWishlisted, onToggleWishlist }) => {
   const [imgIdx, setImgIdx] = useState(0);
   const [hovered, setHovered] = useState(false);
   const images = product.images || [];
   const hasMultiple = images.length > 1;
+
+  // Auto-swipe images smoothly on hover (instant transition start)
+  useEffect(() => {
+    if (!hovered || !hasMultiple) {
+      setImgIdx(0);
+      return;
+    }
+
+    // Instantly transition to the second image on hover enter
+    setImgIdx(1);
+
+    const interval = setInterval(() => {
+      setImgIdx((prev) => (prev + 1) % images.length);
+    }, 1400);
+
+    return () => clearInterval(interval);
+  }, [hovered, hasMultiple, images.length]);
 
   const prev = (e) => { e.stopPropagation(); setImgIdx(i => (i === 0 ? images.length - 1 : i - 1)); };
   const next = (e) => { e.stopPropagation(); setImgIdx(i => (i === images.length - 1 ? 0 : i + 1)); };
@@ -91,13 +109,42 @@ const ProductCard = ({ product, onClick, onQuickAdd }) => {
       className="group cursor-pointer flex flex-col p-4 rounded-2xl transition-all duration-500 ease-[cubic-bezier(0.25,1,0.5,1)] hover:bg-white hover:shadow-[0_30px_60px_-15px_rgba(0,0,0,0.08)] hover:-translate-y-2 border border-transparent hover:border-neutral-100/80"
     >
       {/* Image Container */}
-      <div className="relative aspect-[7/10] bg-neutral-100 overflow-hidden squre-xl shadow-[0_2px_10px_-4px_rgba(0,0,0,0.1)]">
+      <div className="relative aspect-[7/10] bg-neutral-100 overflow-hidden rounded-xl shadow-[0_2px_10px_-4px_rgba(0,0,0,0.1)]">
+        {/* Wishlist Heart Button */}
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onToggleWishlist();
+          }}
+          className={`absolute top-3 right-3 z-10 w-9 h-9 rounded-full bg-white/70 backdrop-blur-md flex items-center justify-center transition-all duration-300 shadow-md border active:scale-90
+            ${isWishlisted 
+              ? 'border-red-100 text-red-500' 
+              : 'border-white/20 text-neutral-800 hover:text-red-500 bg-white/70 hover:bg-white'}`}
+        >
+          <svg 
+            xmlns="http://www.w3.org/2000/svg" 
+            width="15" 
+            height="15" 
+            fill={isWishlisted ? "currentColor" : "none"} 
+            viewBox="0 0 24 24" 
+            stroke="currentColor" 
+            strokeWidth={1.8}
+            className={isWishlisted ? "scale-110" : ""}
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
+          </svg>
+        </button>
+
         {images.length > 0 ? (
-          <img
-            src={images[imgIdx]?.url}
-            alt={product.title}
-            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-          />
+          images.map((img, index) => (
+            <img
+              key={index}
+              src={img.url}
+              alt={product.title}
+              className={`absolute inset-0 w-full h-full object-cover transition-all duration-[1100ms] ease-in-out group-hover:scale-[1.06]
+                ${index === imgIdx ? "opacity-100 scale-100 z-0" : "opacity-0 scale-[0.96] pointer-events-none z-0"}`}
+            />
+          ))
         ) : (
           <div className="w-full h-full flex items-center justify-center text-neutral-300 text-3xl">
             🖼
@@ -106,7 +153,7 @@ const ProductCard = ({ product, onClick, onQuickAdd }) => {
 
         {/* Carousel controls - Only show on hover if multiple images */}
         {hasMultiple && (
-          <div className={`absolute inset-0 flex items-center justify-between px-2 transition-opacity duration-300 ${hovered ? 'opacity-100' : 'opacity-0'}`}>
+          <div className={`absolute inset-0 flex items-center justify-between px-2 transition-opacity duration-300 z-10 ${hovered ? 'opacity-100' : 'opacity-0'}`}>
             <button onClick={prev} className="p-2 bg-white/80 hover:bg-white text-neutral-800 rounded-full backdrop-blur-sm transition-colors shadow-sm">
               <ChevronLeftIcon />
             </button>
@@ -194,6 +241,7 @@ const Home = () => {
   const [sort, setSort] = useState("newest");
   const [toastShow, setToastShow] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
+  const { isLiked, handleToggleWishlist } = useWishlist();
 
   useEffect(() => {
     handleGetAllProducts();
@@ -201,6 +249,18 @@ const Home = () => {
   }, []);
 
   const cartCount = (cartItems || []).reduce((sum, item) => sum + item.quantity, 0);
+
+  const onToggleWishlist = async (productId) => {
+    if (!user) {
+      navigate("/login");
+      return;
+    }
+    const result = await handleToggleWishlist({ productId });
+    if (result?.success) {
+      setToastMessage(result.message);
+      setToastShow(true);
+    }
+  };
 
   const onQuickAdd = async (productId) => {
     if (!user) {
@@ -289,6 +349,8 @@ const Home = () => {
                   product={product}
                   onClick={() => navigate(`/product/${product._id}`)}
                   onQuickAdd={onQuickAdd}
+                  isWishlisted={isLiked(product._id)}
+                  onToggleWishlist={() => onToggleWishlist(product._id)}
                 />
               ))}
             </div>

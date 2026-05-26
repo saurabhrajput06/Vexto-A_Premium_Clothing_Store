@@ -75,7 +75,7 @@ const ProductCard = ({ product }) => {
           <img
             src={images[imgIdx]?.url}
             alt={product.title}
-            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+            className="w-full h-full object-cover transition-transform duration-500 ease-[cubic-bezier(0.25,1,0.5,1)] group-hover:scale-110"
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center text-neutral-300">

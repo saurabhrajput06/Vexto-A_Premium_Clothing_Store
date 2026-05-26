@@ -448,20 +448,31 @@ const Cart = () => {
       <div className="max-w-7xl mx-auto px-6 sm:px-10 pt-12 pb-24">
 
         {/* Page Header */}
-        <div className="mb-10 sm:mb-14">
-          <p className="text-[10px] font-semibold tracking-[0.3em] uppercase text-neutral-400 mb-4">
-            Shopping Bag
-          </p>
-          <div className="flex items-baseline gap-4">
-            <h1 className="font-serif text-3xl sm:text-[2.5rem] text-neutral-900 leading-tight tracking-[-0.02em]">
-              Your Bag
-            </h1>
-            {cartItems && cartItems.length > 0 && (
-              <span className="text-xs font-normal text-neutral-400">
-                ({itemCount} {itemCount === 1 ? "item" : "items"})
-              </span>
-            )}
+        <div className="mb-10 sm:mb-14 flex flex-col sm:flex-row sm:items-baseline justify-between gap-4 border-b border-neutral-100 pb-6">
+          <div>
+            <p className="text-[10px] font-semibold tracking-[0.3em] uppercase text-neutral-400 mb-4">
+              Shopping Bag
+            </p>
+            <div className="flex items-baseline gap-4">
+              <h1 className="font-serif text-3xl sm:text-[2.5rem] text-neutral-900 leading-tight tracking-[-0.02em]">
+                Your Bag
+              </h1>
+              {cartItems && cartItems.length > 0 && (
+                <span className="text-xs font-normal text-neutral-400">
+                  ({itemCount} {itemCount === 1 ? "item" : "items"})
+                </span>
+              )}
+            </div>
           </div>
+          <button
+            onClick={() => navigate("/home")}
+            className="group self-start sm:self-auto text-xs font-bold text-neutral-900 tracking-widest uppercase flex items-center gap-1.5 hover:text-neutral-600 transition-colors"
+          >
+            Back to Collection
+            <span className="transform translate-x-0 group-hover:translate-x-1 transition-transform duration-300">
+              →
+            </span>
+          </button>
         </div>
 
         {/* Content */}

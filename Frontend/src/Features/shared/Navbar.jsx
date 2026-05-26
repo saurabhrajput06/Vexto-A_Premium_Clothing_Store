@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router';
 import { useSelector } from 'react-redux';
 import { useAuth } from '../Auth/Hook/UseAuth';
+import { useWishlist } from '../Wishlist/Hook/useWishlist';
 
 const SearchIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
@@ -37,6 +38,14 @@ const Navbar = () => {
   const user = useSelector(state => state.auth.user);
   const cartItems = useSelector(state => state.cart.items);
   const cartCount = (cartItems || []).reduce((sum, item) => sum + item.quantity, 0);
+  const { items: wishlistItems, handleGetWishlist } = useWishlist();
+  const wishlistCount = wishlistItems?.length || 0;
+
+  useEffect(() => {
+    if (user) {
+      handleGetWishlist();
+    }
+  }, [user]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -85,13 +94,21 @@ const Navbar = () => {
         </span>
 
         {/* Right Icons */}
-        <div className="flex items-center gap-5 ml-auto sm:ml-0">
+        <div className="flex items-center gap-3 sm:gap-5 ml-auto sm:ml-0">
           <button className={`transition-colors ${iconClass}`}>
             <SearchIcon />
           </button>
           
-          <button className={`transition-colors hidden sm:block ${iconClass}`}>
+          <button
+            onClick={() => navigate("/wishlist")}
+            className={`relative transition-colors flex items-center ${iconClass}`}
+          >
             <HeartIcon />
+            {wishlistCount > 0 && (
+              <span className={`absolute -top-1.5 -right-2 w-[16px] h-[16px] text-[9px] font-bold rounded-full flex items-center justify-center leading-none ${transparent ? 'bg-white text-black' : 'bg-black text-white'}`}>
+                {wishlistCount}
+              </span>
+            )}
           </button>
 
           <button

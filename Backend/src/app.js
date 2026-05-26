@@ -5,6 +5,7 @@ import authRoutes from "./Routes/auth.routes.js";
 import productRoutes from "./Routes/product.routes.js";
 import cartRoutes from "./Routes/cart.route.js";
 import cors from "cors";
+import wishlistRoutes from "./Routes/wishlist.route.js";
 
 
 
@@ -58,7 +59,10 @@ app.use("/api/cart", (req, res, next) => {
 }, cartRoutes);
 // app.use("/api/cart",cartRoutes);
 
-
+app.use("/api/wishlist",(req,res,next)=>{
+    console.log("Wishlist Route Hit! Path:",req.path);
+    next();
+},wishlistRoutes);
 
 
 

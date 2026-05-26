@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router";
 import { useSelector } from "react-redux";
 import { useProduct } from "../hook/useProduct";
 import { useCart } from "../../Cart/Hook/useCart";
+import { useWishlist } from "../../Wishlist/Hook/useWishlist";
 import Footer from "../../shared/Footer";
 import Navbar from "../../shared/Navbar";
 
@@ -76,8 +77,15 @@ const ProductDetails = () => {
   const user = useSelector(state => state.auth.user);
   const { handleGetProductById } = useProduct();
   const { handleAddToCart } = useCart();
+  const { isLiked, handleToggleWishlist, handleGetWishlist } = useWishlist();
 
   const [product, setProduct] = useState(null);
+
+  useEffect(() => {
+    if (user) {
+      handleGetWishlist();
+    }
+  }, [user]);
   const [loading, setLoading] = useState(true);
   const [imgIdx, setImgIdx] = useState(0);
   const [selectedVariant, setSelectedVariant] = useState(null);
@@ -85,6 +93,30 @@ const ProductDetails = () => {
   const [toastShow, setToastShow] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
   const [toastType, setToastType] = useState("success");
+
+  const onToggleWishlist = async () => {
+    if (!user) {
+      navigate("/login");
+      return;
+    }
+    try {
+      const result = await handleToggleWishlist({
+        productId: product._id,
+        variantId: selectedVariant?._id
+      });
+      if (result?.success) {
+        setToastType("success");
+        setToastMessage(result.message);
+      } else {
+        setToastType("error");
+        setToastMessage(result?.message || "Failed to update wishlist");
+      }
+    } catch (err) {
+      setToastType("error");
+      setToastMessage("Something went wrong");
+    }
+    setToastShow(true);
+  };
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -189,7 +221,7 @@ const ProductDetails = () => {
         <div className="flex flex-col lg:flex-row gap-16 xl:gap-24">
 
           {/* Left: Image Gallery */}
-          <div className="w-full lg:w-[55%] xl:w-[60%] flex flex-col gap-4">
+          <div className="w-full lg:w-[45%] xl:w-[40%] max-w-xl mx-auto lg:mx-0 flex flex-col gap-4">
             {/* Main Image */}
             <div className="relative aspect-[3/4] sm:aspect-[4/5] bg-neutral-50 rounded-md overflow-hidden group">
               {images.length > 0 && images[imgIdx] ? (
@@ -229,9 +261,9 @@ const ProductDetails = () => {
             )}
           </div>
 
-          {/* Right: Product Info (Sticky on Desktop) */}
-          <div className="w-full lg:w-[45%] xl:w-[40%]">
-            <div className="lg:sticky lg:top-40 flex flex-col">
+          {/* Right: Product Info */}
+          <div className="w-full lg:w-[55%] xl:w-[60%]">
+            <div className="flex flex-col">
               <p className="text-[10px] font-semibold tracking-[0.3em] uppercase text-neutral-400 mb-6">
                 Premium Collection
               </p>
@@ -313,6 +345,27 @@ const ProductDetails = () => {
                   className="flex-1 flex items-center justify-center gap-3 bg-neutral-900 text-white px-8 py-4 rounded-md font-semibold text-xs tracking-[0.15em] uppercase hover:bg-neutral-800 transition-all shadow-lg shadow-neutral-900/10 disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                   <BoltIcon /> Buy Now
+                </button>
+                <button
+                  onClick={onToggleWishlist}
+                  title={product && isLiked(product._id, selectedVariant?._id) ? "Remove from Wishlist" : "Add to Wishlist"}
+                  className={`h-14 w-full sm:w-14 border rounded-md transition-all duration-300 active:scale-95 flex items-center justify-center shrink-0
+                    ${product && isLiked(product._id, selectedVariant?._id) 
+                      ? 'border-red-100 bg-red-50 text-red-500 hover:bg-red-100/70 shadow-sm shadow-red-100/30' 
+                      : 'border-neutral-200 text-neutral-600 hover:border-neutral-900 hover:bg-neutral-50'}`}
+                >
+                  <svg 
+                    xmlns="http://www.w3.org/2000/svg" 
+                    width="18" 
+                    height="18" 
+                    fill={product && isLiked(product._id, selectedVariant?._id) ? "currentColor" : "none"} 
+                    viewBox="0 0 24 24" 
+                    stroke="currentColor" 
+                    strokeWidth={1.8}
+                    className={product && isLiked(product._id, selectedVariant?._id) ? "scale-110" : ""}
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
+                  </svg>
                 </button>
               </div>
 
