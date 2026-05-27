@@ -259,11 +259,11 @@ const Wishlist = () => {
       <main className="max-w-[1440px] mx-auto px-6 sm:px-10 pt-10 pb-24 lg:pt-14 lg:pb-32">
         {/* Breadcrumb & Title */}
         <div className="flex flex-col mb-12 sm:mb-16">
-          <div className="flex items-center gap-2 text-[10px] tracking-[0.2em] font-semibold text-neutral-400 uppercase mb-4">
+          {/* <div className="flex items-center gap-2 text-[10px] tracking-[0.2em] font-semibold text-neutral-400 uppercase mb-4">
             <span className="cursor-pointer hover:text-black transition-colors" onClick={() => navigate("/home")}>Home</span>
             <span>/</span>
             <span className="text-neutral-500">Wishlist</span>
-          </div>
+          </div> */}
 
           <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-4 border-b border-neutral-100 pb-6">
             <div className="flex items-baseline gap-3">
