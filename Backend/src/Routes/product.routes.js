@@ -1,8 +1,8 @@
 import express from "express";
-import { AuthenticateSeller } from "../Middleware/auth.middleware.js";
+import { AuthenticateSeller, AuthenticateUser } from "../Middleware/auth.middleware.js";
 import multer from "multer";
 import { createProductValidator } from "../Validator/product.validator.js";
-import { createProduct, getSellerProducts , getAllProducts, getProductById, addProductVariant, updateVariantStock } from "../Controllers/product.controller.js";
+import { createProduct, getSellerProducts , getAllProducts, getProductById, addProductVariant, updateVariantStock, addProductReview } from "../Controllers/product.controller.js";
 
 
 const upload = multer({ storage: multer.memoryStorage(),
@@ -54,5 +54,12 @@ router.get("/",getAllProducts)
  * @access Public
  */
 router.get("/:id", getProductById)
+
+/**
+ * @route POST /api/products/:id/reviews
+ * @description Add a review to a product
+ * @access Private (logged-in user)
+ */
+router.post("/:id/reviews", AuthenticateUser, addProductReview)
 
 export default router;  

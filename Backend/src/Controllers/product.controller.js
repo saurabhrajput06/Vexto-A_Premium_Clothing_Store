@@ -162,3 +162,48 @@ export async function updateVariantStock(req, res) {
         return res.status(500).json({ message: "Error updating stock" });
     }
 }
+
+// add product review
+export async function addProductReview(req, res) {
+    try {
+        const { rating, comment } = req.body;
+        const productId = req.params.id;
+
+        const product = await productModel.findById(productId);
+        if (!product) {
+            return res.status(404).json({ message: "Product not found", success: false });
+        }
+
+        if (!product.reviews) {
+            product.reviews = [];
+        }
+
+        const alreadyReviewed = product.reviews.find(
+            (r) => r.user && r.user.toString() === req.user._id.toString()
+        );
+
+        if (alreadyReviewed) {
+            return res.status(400).json({ message: "Product already reviewed", success: false });
+        }
+
+        const review = {
+            name: req.user.fullname || "Anonymous",
+            rating: Number(rating),
+            comment: comment || "",
+            user: req.user._id,
+            createdAt: new Date()
+        };
+
+        product.reviews.push(review);
+        product.numReviews = product.reviews.length;
+        product.rating =
+            product.reviews.reduce((acc, item) => item.rating + acc, 0) /
+            product.reviews.length;
+
+        await product.save();
+        return res.status(201).json({ message: "Review added successfully", success: true, product });
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({ message: "Error adding review", success: false });
+    }
+}

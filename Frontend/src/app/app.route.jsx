@@ -12,6 +12,7 @@ import Protected from "../Features/Auth/components/Protected";
 import Home from "../Features/Products/Pages/Home";
 import ProductDetails from "../Features/Products/Pages/ProductDetails";
 import SellerProductDetails from "../Features/Products/Pages/SellerProductDetails";
+import NotFoundPage from "../Features/shared/NotFoundPage";
 
 export const router = createBrowserRouter([
     {
@@ -69,5 +70,9 @@ export const router = createBrowserRouter([
                 element: <Protected role={"seller"}><SellerProductDetails /></Protected>
             }
         ]
+    },
+    {
+        path: "*",
+        element: <NotFoundPage />
     }
 ])

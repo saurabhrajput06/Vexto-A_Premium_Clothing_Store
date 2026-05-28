@@ -68,29 +68,77 @@ const Toast = ({ show, message, onClose }) => {
   );
 };
 
+const getPastelColors = (r, g, b) => {
+  // Mix with white (85% white, 15% image color) to create a beautiful subtle light tint
+  const bgR = Math.round((r + 255 * 5.5) / 6.5);
+  const bgG = Math.round((g + 255 * 5.5) / 6.5);
+  const bgB = Math.round((b + 255 * 5.5) / 6.5);
+
+  // Border: slightly darker (75% white, 25% image color)
+  const borderR = Math.round((r + 255 * 3.5) / 4.5);
+  const borderG = Math.round((g + 255 * 3.5) / 4.5);
+  const borderB = Math.round((b + 255 * 3.5) / 4.5);
+
+  return {
+    bg: `rgb(${bgR}, ${bgG}, ${bgB})`,
+    border: `rgb(${borderR}, ${borderG}, ${borderB})`,
+    shadow: `rgba(${r}, ${g}, ${b}, 0.12)`
+  };
+};
+
+const getHashColors = (str) => {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    hash = str.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  const h = Math.abs(hash % 360);
+  const s = 35 + (Math.abs(hash) % 15); // 35% - 50%
+  return {
+    bg: `hsl(${h}, ${s}%, 96%)`,
+    border: `hsl(${h}, ${s}%, 90%)`,
+    shadow: `hsla(${h}, ${s}%, 50%, 0.12)`
+  };
+};
+
 /* ── Product Card ── */
 const ProductCard = ({ product, onClick, onQuickAdd, isWishlisted, onToggleWishlist }) => {
   const [imgIdx, setImgIdx] = useState(0);
   const [hovered, setHovered] = useState(false);
   const images = product.images || [];
   const hasMultiple = images.length > 1;
+  const [colors, setColors] = useState({
+    bg: "transparent",
+    border: "transparent",
+    shadow: "rgba(0, 0, 0, 0.08)"
+  });
 
-  // Auto-swipe images smoothly on hover (instant transition start)
   useEffect(() => {
-    if (!hovered || !hasMultiple) {
-      setImgIdx(0);
+    if (images.length === 0) {
+      setColors(getHashColors(product.title || product._id || "Product"));
       return;
     }
 
-    // Instantly transition to the second image on hover enter
-    setImgIdx(1);
-
-    const interval = setInterval(() => {
-      setImgIdx((prev) => (prev + 1) % images.length);
-    }, 1400);
-
-    return () => clearInterval(interval);
-  }, [hovered, hasMultiple, images.length]);
+    const imageUrl = images[0].url;
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.onload = () => {
+      try {
+        const canvas = document.createElement("canvas");
+        canvas.width = 1;
+        canvas.height = 1;
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0, 1, 1);
+        const [r, g, b] = ctx.getImageData(0, 0, 1, 1).data;
+        setColors(getPastelColors(r, g, b));
+      } catch (e) {
+        setColors(getHashColors(product.title || product._id || "Product"));
+      }
+    };
+    img.onerror = () => {
+      setColors(getHashColors(product.title || product._id || "Product"));
+    };
+    img.src = imageUrl;
+  }, [images, product.title, product._id]);
 
   const prev = (e) => { e.stopPropagation(); setImgIdx(i => (i === 0 ? images.length - 1 : i - 1)); };
   const next = (e) => { e.stopPropagation(); setImgIdx(i => (i === images.length - 1 ? 0 : i + 1)); };
@@ -106,10 +154,15 @@ const ProductCard = ({ product, onClick, onQuickAdd, isWishlisted, onToggleWishl
       onClick={onClick}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
-      className="group cursor-pointer flex flex-col p-4 rounded-2xl transition-all duration-500 ease-[cubic-bezier(0.25,1,0.5,1)] hover:bg-white hover:shadow-[0_30px_60px_-15px_rgba(0,0,0,0.08)] hover:-translate-y-2 border border-transparent hover:border-neutral-100/80"
+      className="group cursor-pointer flex flex-col p-4 rounded-none transition-all duration-500 ease-[cubic-bezier(0.25,1,0.5,1)] hover:-translate-y-2 border"
+      style={{
+        backgroundColor: hovered ? colors.bg : 'transparent',
+        borderColor: hovered ? colors.border : 'transparent',
+        boxShadow: hovered ? `0 30px 60px -15px ${colors.shadow}` : 'none'
+      }}
     >
       {/* Image Container */}
-      <div className="relative aspect-[7/10] bg-neutral-100 overflow-hidden rounded-xl shadow-[0_2px_10px_-4px_rgba(0,0,0,0.1)]">
+      <div className="relative aspect-[7/10] bg-neutral-100 overflow-hidden rounded-none shadow-[0_2px_10px_-4px_rgba(0,0,0,0.1)]">
         {/* Wishlist Heart Button */}
         <button
           onClick={(e) => {
@@ -170,7 +223,7 @@ const ProductCard = ({ product, onClick, onQuickAdd, isWishlisted, onToggleWishl
               e.stopPropagation();
               onQuickAdd(product._id);
             }}
-            className="w-full bg-neutral-900 text-white py-3.5 px-4 rounded-md font-semibold text-xs tracking-widest uppercase hover:bg-neutral-800 transition-colors flex items-center justify-center gap-2 shadow-lg"
+            className="w-full bg-neutral-900 text-white py-3.5 px-4 rounded-none font-semibold text-xs tracking-widest uppercase hover:bg-neutral-800 transition-colors flex items-center justify-center gap-2 shadow-lg"
           >
             <CartIconSmall /> Quick Add
           </button>

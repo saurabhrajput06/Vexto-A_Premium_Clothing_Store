@@ -195,7 +195,7 @@ const Welcome = () => {
       </div>
 
       {/* ===== SCROLL INDICATOR (Bottom) ===== */}
-      <div
+      {/* <div
         className="scroll-indicator"
         style={{
           position: 'absolute',
@@ -207,7 +207,7 @@ const Welcome = () => {
         }}
       >
         Scroll to Discover
-      </div>
+      </div> */}
 
       {/* ===== CORNER BRANDING ===== */}
       <div

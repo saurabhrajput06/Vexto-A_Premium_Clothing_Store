@@ -41,4 +41,9 @@ export async function createProductVariant(productId, formData) {
 export async function updateProductVariantStock(productId, variantId, stock) {
     const response = await productApi.patch(`/${productId}/variants/${variantId}/stock`, { stock });
     return response.data;
+}
+
+export async function addProductReview(productId, { rating, comment }) {
+    const response = await productApi.post(`/${productId}/reviews`, { rating, comment });
+    return response.data;
 }
