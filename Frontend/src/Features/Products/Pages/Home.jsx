@@ -100,6 +100,9 @@ const getHashColors = (str) => {
   };
 };
 
+// Cache to store extracted pastel colors and prevent heavy onload extraction on every re-render
+const colorCache = {};
+
 /* ── Product Card ── */
 const ProductCard = ({ product, onClick, onQuickAdd, isWishlisted, onToggleWishlist }) => {
   const [imgIdx, setImgIdx] = useState(0);
@@ -113,8 +116,16 @@ const ProductCard = ({ product, onClick, onQuickAdd, isWishlisted, onToggleWishl
   });
 
   useEffect(() => {
+    if (!product._id) return;
+    if (colorCache[product._id]) {
+      setColors(colorCache[product._id]);
+      return;
+    }
+
     if (images.length === 0) {
-      setColors(getHashColors(product.title || product._id || "Product"));
+      const defaultColors = getHashColors(product.title || product._id || "Product");
+      colorCache[product._id] = defaultColors;
+      setColors(defaultColors);
       return;
     }
 
@@ -129,13 +140,19 @@ const ProductCard = ({ product, onClick, onQuickAdd, isWishlisted, onToggleWishl
         const ctx = canvas.getContext("2d");
         ctx.drawImage(img, 0, 0, 1, 1);
         const [r, g, b] = ctx.getImageData(0, 0, 1, 1).data;
-        setColors(getPastelColors(r, g, b));
+        const extractedColors = getPastelColors(r, g, b);
+        colorCache[product._id] = extractedColors;
+        setColors(extractedColors);
       } catch (e) {
-        setColors(getHashColors(product.title || product._id || "Product"));
+        const hashColors = getHashColors(product.title || product._id || "Product");
+        colorCache[product._id] = hashColors;
+        setColors(hashColors);
       }
     };
     img.onerror = () => {
-      setColors(getHashColors(product.title || product._id || "Product"));
+      const hashColors = getHashColors(product.title || product._id || "Product");
+      colorCache[product._id] = hashColors;
+      setColors(hashColors);
     };
     img.src = imageUrl;
   }, [images, product.title, product._id]);
@@ -170,17 +187,17 @@ const ProductCard = ({ product, onClick, onQuickAdd, isWishlisted, onToggleWishl
             onToggleWishlist();
           }}
           className={`absolute top-3 right-3 z-10 w-9 h-9 rounded-full bg-white/70 backdrop-blur-md flex items-center justify-center transition-all duration-300 shadow-md border active:scale-90
-            ${isWishlisted 
-              ? 'border-red-100 text-red-500' 
+            ${isWishlisted
+              ? 'border-red-100 text-red-500'
               : 'border-white/20 text-neutral-800 hover:text-red-500 bg-white/70 hover:bg-white'}`}
         >
-          <svg 
-            xmlns="http://www.w3.org/2000/svg" 
-            width="15" 
-            height="15" 
-            fill={isWishlisted ? "currentColor" : "none"} 
-            viewBox="0 0 24 24" 
-            stroke="currentColor" 
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="15"
+            height="15"
+            fill={isWishlisted ? "currentColor" : "none"}
+            viewBox="0 0 24 24"
+            stroke="currentColor"
             strokeWidth={1.8}
             className={isWishlisted ? "scale-110" : ""}
           >
@@ -252,8 +269,23 @@ const ProductCard = ({ product, onClick, onQuickAdd, isWishlisted, onToggleWishl
 
 
 /* ── Hero ── */
-const Hero = () => (
-  <div className="relative pt-44 pb-36 sm:pt-56 sm:pb-48 px-6 sm:px-10 text-center overflow-hidden -mt-16">
+const Hero = () => {
+  const navigate = useNavigate();
+
+  const handleShopCollection = () => {
+    // Open the Navbar search bar via custom event
+    window.dispatchEvent(new Event("open-search"));
+    // Also scroll up so the search bar is visible
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const handleBrowseCategories = () => {
+    const el = document.getElementById("product-section");
+    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+
+  return (
+  <div className="relative pt-24 pb-16 sm:pt-32 sm:pb-20 px-6 sm:px-10 text-center overflow-hidden -mt-16">
     {/* Background Image */}
     <div
       className="absolute inset-0 bg-cover bg-center bg-no-repeat"
@@ -274,12 +306,22 @@ const Hero = () => (
       <p className="text-base sm:text-lg text-white/90 max-w-xl leading-relaxed mb-14 font-normal drop-shadow-md">
         Discover our curated selection of premium pieces. Designed for the modern minimalist, crafted with uncompromising quality.
       </p>
-      <button className="text-xs font-semibold bg-white text-black px-10 py-4 rounded-md hover:bg-neutral-200 transition-all uppercase tracking-[0.2em] shadow-xl hover:-translate-y-0.5 transform duration-200">
-        Shop Collection
-      </button>
+      <div className="flex flex-col sm:flex-row items-center gap-4">
+        <button
+          onClick={handleShopCollection}
+          className="flex items-center gap-2 text-xs font-semibold bg-white text-black px-10 py-4 rounded-md hover:bg-neutral-200 transition-all uppercase tracking-[0.2em] shadow-xl hover:-translate-y-0.5 transform duration-200"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <circle cx="11" cy="11" r="8" /><path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35" />
+          </svg>
+          Shop Collection
+        </button>
+      </div>
     </div>
   </div>
-);
+  );
+};
+
 
 /* ── Home Page ── */
 const Home = () => {
@@ -290,7 +332,7 @@ const Home = () => {
   const navigate = useNavigate();
   const { handleAddToCart, handleGetCart } = useCart();
 
-  const [search, setSearch] = useState("");
+  const search = useSelector(state => state.product.search || "");
   const [sort, setSort] = useState("newest");
   const [toastShow, setToastShow] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
@@ -346,22 +388,28 @@ const Home = () => {
       <Navbar />
       <Hero />
 
+
       {/* Main Content Area */}
-      <div className="max-w-7xl mx-auto px-6 sm:px-10 py-16">
+      <div id="product-section" className="max-w-7xl mx-auto px-6 sm:px-10 py-16">
+        {/* Section Title */}
+        <div className="section-title mb-16 flex flex-col items-center text-center">
+          <h3 className="font-serif text-3xl sm:text-5xl font-medium tracking-tight text-neutral-950 mb-3">
+            Curated Picks
+          </h3>
+          <div className="w-12 h-[2px] bg-neutral-950 mb-4 rounded-full"></div>
+          <p className="text-neutral-500 text-sm sm:text-base font-light tracking-wide max-w-md leading-relaxed">
+            Hand-selected luxury pieces for your wardrobe.
+          </p>
+        </div>
+
         {/* Filters and Controls */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 mb-12 border-b border-neutral-200 pb-8">
-          <div className="relative w-full sm:w-80">
-            <span className="absolute left-5 top-1/2 -translate-y-1/2 text-neutral-400 w-5 h-5">
-              <SearchIcon />
-            </span>
-            <input
-              id="search-products"
-              type="text"
-              placeholder="Search products…"
-              value={search}
-              onChange={e => setSearch(e.target.value)}
-              className="w-full bg-neutral-50 border border-neutral-200 text-sm rounded-md py-3.5 pl-14 pr-4 text-neutral-900 font-medium focus:outline-none focus:border-neutral-900 focus:ring-1 focus:ring-neutral-900 focus:bg-white transition-all placeholder:text-neutral-400"
-            />
+          <div className="flex-1">
+            {search && (
+              <p className="text-sm text-neutral-500 font-medium">
+                Showing results for "<span className="text-neutral-900 font-semibold">{search}</span>"
+              </p>
+            )}
           </div>
 
           <div className="flex items-center gap-4 w-full sm:w-auto">

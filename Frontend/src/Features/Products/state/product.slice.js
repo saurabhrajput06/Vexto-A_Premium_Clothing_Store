@@ -8,7 +8,7 @@ const productSlice = createSlice({
    initialState:{
     sellerProducts:[],
     products:[],
-    
+    search: "",
    },
    reducers:{
 
@@ -20,9 +20,12 @@ const productSlice = createSlice({
     //set all products
     setProducts:(state,action)=>{
         state.products = action.payload
+    },
+    setSearch:(state,action)=>{
+        state.search = action.payload
     }
    }
 })
 
-export const {setSellerProducts , setProducts} = productSlice.actions
+export const {setSellerProducts , setProducts, setSearch} = productSlice.actions
 export default productSlice.reducer       

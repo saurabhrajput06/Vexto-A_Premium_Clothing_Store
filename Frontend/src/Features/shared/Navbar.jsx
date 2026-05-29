@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { useAuth } from '../Auth/Hook/UseAuth';
 import { useWishlist } from '../Wishlist/Hook/useWishlist';
+import { setSearch } from '../Products/state/product.slice';
 
 const SearchIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
@@ -34,12 +35,42 @@ const Navbar = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const { handleLogout } = useAuth();
-  
+
   const user = useSelector(state => state.auth.user);
+  const dispatch = useDispatch();
+  const search = useSelector(state => state.product.search || "");
+  const [showSearch, setShowSearch] = useState(!!search);
   const cartItems = useSelector(state => state.cart.items);
   const cartCount = (cartItems || []).reduce((sum, item) => sum + item.quantity, 0);
   const { items: wishlistItems, handleGetWishlist } = useWishlist();
   const wishlistCount = wishlistItems?.length || 0;
+
+  const searchInputRef = useRef(null);
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (
+        (e.key === 'k' && (e.metaKey || e.ctrlKey)) ||
+        (e.key === '/' && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA')
+      ) {
+        e.preventDefault();
+        setShowSearch(true);
+      }
+    };
+    const handleOpenSearch = () => setShowSearch(true);
+    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('open-search', handleOpenSearch);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('open-search', handleOpenSearch);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (showSearch && searchInputRef.current) {
+      searchInputRef.current.focus();
+    }
+  }, [showSearch]);
 
   useEffect(() => {
     if (user) {
@@ -57,15 +88,15 @@ const Navbar = () => {
   }, []);
 
   const isHome = location.pathname === '/';
-  const transparent = isHome && !isScrolled;
+  const transparent = false;
 
-  const navBg = transparent 
-    ? "bg-transparent border-transparent" 
-    : "bg-white/80 backdrop-blur-md border-neutral-200";
+  const navBg = isScrolled
+    ? "bg-white/80 backdrop-blur-md border-neutral-200"
+    : "bg-white border-neutral-200";
 
-  const textClass = transparent ? "text-white/90 hover:text-white" : "text-neutral-700 hover:text-black";
-  const iconClass = transparent ? "text-white/90 hover:text-white" : "text-neutral-500 hover:text-black";
-  const logoClass = transparent ? "text-white" : "text-black";
+  const textClass = "text-neutral-700 hover:text-black";
+  const iconClass = "text-neutral-500 hover:text-black";
+  const logoClass = "text-black";
 
   const onLogout = async () => {
     await handleLogout();
@@ -80,7 +111,18 @@ const Navbar = () => {
           <button onClick={() => navigate("/")} className={`text-[11px] font-semibold uppercase tracking-widest transition-colors ${textClass}`}>
             NEW
           </button>
-          <button onClick={() => navigate("/")} className={`text-[11px] font-semibold uppercase tracking-widest transition-colors ${textClass}`}>
+          <button
+            onClick={() => {
+              const isOnHome = location.pathname === "/home" || location.pathname === "/";
+              if (isOnHome) {
+                const el = document.getElementById("product-section");
+                if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+              } else {
+                navigate("/collections");
+              }
+            }}
+            className={`text-[11px] font-semibold uppercase tracking-widest transition-colors ${textClass}`}
+          >
             COLLECTIONS
           </button>
         </div>
@@ -95,10 +137,13 @@ const Navbar = () => {
 
         {/* Right Icons */}
         <div className="flex items-center gap-3 sm:gap-5 ml-auto sm:ml-0">
-          <button className={`transition-colors ${iconClass}`}>
+          <button
+            onClick={() => setShowSearch(!showSearch)}
+            className={`w-9 h-9 flex items-center justify-center rounded-full hover:bg-neutral-100/50 transition-colors ${iconClass}`}
+          >
             <SearchIcon />
           </button>
-          
+
           <button
             onClick={() => navigate("/wishlist")}
             className={`relative transition-colors flex items-center ${iconClass}`}
@@ -167,6 +212,53 @@ const Navbar = () => {
               <UserIcon />
             </button>
           )}
+        </div>
+      </div>
+
+      {/* Dropdown Search Panel */}
+      <div
+        className={`absolute left-0 right-0 top-16 bg-white border-b border-neutral-200 px-6 py-4 shadow-lg transition-all duration-300 ease-in-out z-40
+          ${showSearch
+            ? 'opacity-100 translate-y-0 pointer-events-auto'
+            : 'opacity-0 -translate-y-4 pointer-events-none'}`}
+      >
+        <div className="max-w-5xl mx-auto flex items-center gap-3 bg-neutral-50 px-4 py-2.5 rounded-full border border-neutral-200 shadow-sm focus-within:border-neutral-400 focus-within:ring-1 focus-within:ring-neutral-400 transition-all duration-200">
+          <span className="text-neutral-400 shrink-0">
+            <SearchIcon />
+          </span>
+          <input
+            ref={searchInputRef}
+            type="text"
+            placeholder="Search premium collections..."
+            value={search}
+            onChange={(e) => {
+              dispatch(setSearch(e.target.value));
+              if (location.pathname !== "/home" && location.pathname !== "/") {
+                navigate("/home");
+              }
+            }}
+            className="bg-transparent text-sm outline-none border-none text-neutral-800 w-full placeholder-neutral-400 font-medium"
+          />
+          {search && (
+            <button
+              onClick={() => dispatch(setSearch(""))}
+              className="text-neutral-400 hover:text-black transition-colors text-xs font-semibold uppercase tracking-wider"
+            >
+              Clear
+            </button>
+          )}
+          <button
+            onClick={() => {
+              setShowSearch(false);
+              dispatch(setSearch(""));
+            }}
+            className="text-neutral-400 hover:text-black font-semibold text-xs uppercase tracking-wider pl-3 border-l border-neutral-200 flex items-center gap-1 shrink-0"
+          >
+            Close
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} className="inline">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
         </div>
       </div>
     </nav>
