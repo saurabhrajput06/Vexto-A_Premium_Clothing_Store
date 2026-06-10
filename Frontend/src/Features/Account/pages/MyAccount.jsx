@@ -453,7 +453,13 @@ const MyAccount = () => {
                   icon={tab.icon}
                   label={tab.label}
                   active={activeTab === tab.id}
-                  onClick={() => setActiveTab(tab.id)}
+                  onClick={() => {
+                    if (tab.id === 'wishlist') {
+                      navigate('/wishlist');
+                    } else {
+                      setActiveTab(tab.id);
+                    }
+                  }}
                 />
               ))}
               <div className="pt-3 border-t border-neutral-100 mt-3">

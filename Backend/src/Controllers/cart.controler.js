@@ -2,7 +2,9 @@ import cartModel from "../Models/cart.model.js";
 import userModel from "../Models/user.model.js";
 import productModel from "../Models/product.model.js";
 import { stockOfVariantInProduct } from "../Dao/product.dao.js";
+import { createOrder } from "../Services/payment.service.js";
 import mongoose from "mongoose";
+
 
 
 
@@ -274,7 +276,7 @@ export const updateCartItem = async (req, res) => {
 }
 
 
-export const createOrder = async (req, res) => {
+export const createPaymentOrder = async (req, res) => {
     try {
         const order = await createOrder({ amount: 1000, currency: "INR" })
 

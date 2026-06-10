@@ -33,7 +33,7 @@ export const updateItem = async (itemId, quantity) => {
 }
 
 
-export const createOrder = async ()=>{
-    const response = await cartApiInstance.post("/payment/create-order")
+export const createPaymentOrder = async ()=>{
+    const response = await cartApiInstance.post("/payment/create/order")
     return response.data
 }

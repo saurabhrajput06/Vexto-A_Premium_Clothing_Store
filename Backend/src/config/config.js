@@ -18,6 +18,12 @@ if(!process.env.IMAGEKIT_PRIVATE_KEY){
     throw new Error("IMAGEKIT_PRIVATE_KEY is not defined");
 }
 
+if(!process.env.RAZORPAY_KEY_ID){
+    throw new Error("RAZORPAY_KEY_ID is not defined");
+}
+if(!process.env.RAZORPAY_KEY_SECRET){
+    throw new Error("RAZORPAY_KEY_SECRET is not defined");
+}
 
 
 
@@ -29,4 +35,7 @@ export const config = {
     google_client_secret:process.env.GOOGLE_CLIENT_SECRET,
     NODE_ENV:process.env.NODE_ENV||"development",
     imagekit_private_key:process.env.IMAGEKIT_PRIVATE_KEY,
+    razorpay_key_id:process.env.RAZORPAY_KEY_ID,
+    razorpay_key_secret:process.env.RAZORPAY_KEY_SECRET,
+    
 };

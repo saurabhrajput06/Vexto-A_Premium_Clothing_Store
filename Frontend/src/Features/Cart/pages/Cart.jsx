@@ -4,6 +4,8 @@ import { useCart } from '../Hook/useCart'
 import { useNavigate } from 'react-router'
 import Footer from '../../shared/Footer'
 import Navbar from '../../shared/Navbar'
+import { useRazorpay} from "react-razorpay";
+
 
 
 /* ── Icons ── */
@@ -310,10 +312,39 @@ const OrderSummary = ({ items, navigate }) => {
   const shippingProgress = Math.min(100, (subtotal / 1000) * 100);
   
   
-  const {handlePayment} = useCart()
+  const { handlePayment } = useCart();
+  const { Razorpay } = useRazorpay();
+  const user = useSelector((state) => state.auth.user);
+
   async function handleCheckout() {
-    const order = await handlePayment()
-    console.log("order is",order)
+    const order = await handlePayment();
+    console.log("order is", order);
+    
+    const options = {
+      key: "rzp_test_SzmMgjTVFCeVog",
+      amount: order.amount, // Amount in paise
+      currency: order.currency,
+      name: "Vexto - Premium Collection",
+      description: "Payment",
+      order_id: order.id, //Generate order_id on server
+      handler: (response) => {
+        console.log(response);
+        alert("Payment Successful!!");
+
+      },
+      prefill: {
+        name: user?.fullname,
+        email: user?.email,
+        contact: user?.contact,
+      },
+      theme: {
+        color: "#171717",
+      },
+    };
+
+    const razorpayInstance = new Razorpay(options);
+    razorpayInstance.open();
+
     // navigate("/checkout", { state: { order } })
   }
   return (
@@ -404,8 +435,9 @@ const Cart = () => {
   const cartItems = useSelector(state => state.cart.items)
   const cartLoading = useSelector(state => state.cart.loading)
   const navigate = useNavigate()
-  const { handleGetCart, handleRemoveItem, handleUpdateQuantity,handlePayment } = useCart()
+  const { handleGetCart, handleRemoveItem, handleUpdateQuantity, handlePayment } = useCart()
   const [removingId, setRemovingId] = useState(null)
+
 
   useEffect(() => {
     handleGetCart()

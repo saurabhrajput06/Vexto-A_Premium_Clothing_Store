@@ -1,6 +1,6 @@
 import { useDispatch } from "react-redux";
 import { setItems, addItems, removeItem as removeItemAction, updateItemQuantity, setLoading } from "../State/cart.slice";
-import { addItem, getCart, removeItem, updateItem,createOrder } from "../Service/cart.api";
+import { addItem, getCart, removeItem, updateItem,createPaymentOrder } from "../Service/cart.api";
 
 
 export const useCart = () => {
@@ -68,7 +68,7 @@ export const useCart = () => {
 
     async function handlePayment() {
         try {
-            const data = await createOrder()
+            const data = await createPaymentOrder()
             return data.order
         }
         catch (error) {
