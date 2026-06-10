@@ -4,7 +4,8 @@ import productModel from "../Models/product.model.js";
 import { stockOfVariantInProduct } from "../Dao/product.dao.js";
 import { createOrder } from "../Services/payment.service.js";
 import mongoose from "mongoose";
-
+import { getCartDetails } from "../Dao/cart.dao.js";
+import PaymentModel from "../Models/payment.model.js";
 
 
 
@@ -119,73 +120,16 @@ export const getCart = async (req, res) => {
             });
         }
 
-        let cart = await cartModel.aggregate([
-            {
-                $match: {
-                    user: new mongoose.Types.ObjectId(user._id)
-                }
-            },
-            { $unwind: { path: '$items' } },
-            {
-                $lookup: {
-                    from: 'products',
-                    localField: 'items.product',
-                    foreignField: '_id',
-                    as: 'items.product'
-                }
-            },
-            { $unwind: { path: '$items.product' } },
-            {
-                $unwind: { path: '$items.product.variants' }
-            },
-            {
-                $match: {
-                    $expr: {
-                        $eq: [
-                            '$items.variant',
-                            '$items.product.variants._id'
-                        ]
-                    }
-                }
-            },
-            {
-                $addFields: {
-                    itemPrice: {
-                        price: {
-                            $multiply: [
-                                '$items.quantity',
-                                '$items.product.variants.price.amount'
-                            ]
-                        },
-                        currency: '$items.product.variants.price.currency'
-                    }
-                }
-            },
-            {
-                $group: {
-                    _id: '$_id',
-                    totalPrice: { $sum: '$itemPrice.price' },
-                    currency: {
-                        $first: '$itemPrice.currency'
-                    },
-                    items: { $push: '$items' }
-                }
-            }
-        ], { maxTimeMS: 60000, allowDiskUse: true });
+        let cart = await getCartDetails(user._id);
 
-        // Fallback in case items are filtered out by aggregation matches
-        if (!cart || cart.length === 0) {
-            return res.status(200).json({
-                message: "Cart fetched successfully",
-                success: true,
-                data: { ...existingCart.toObject(), totalPrice: 0, currency: "INR", items: [] }
-            });
+        if (!cart) {
+            cart = await cartModel.create({ user: user._id, items: [] })
         }
 
         return res.status(200).json({
             message: "Cart fetched successfully",
             success: true,
-            data: cart[0]
+            data: cart
         })
     } catch (error) {
         console.log(error)
@@ -277,8 +221,37 @@ export const updateCartItem = async (req, res) => {
 
 
 export const createPaymentOrder = async (req, res) => {
+  
+    const cart = await getCartDetails(req.user._id);
+    if(!cart){
+        return res.status(404).json({message:"Cart not found",success:false})
+    }
+
     try {
-        const order = await createOrder({ amount: 1000, currency: "INR" })
+        const order = await createOrder({ amount: cart.totalPrice, currency: cart.currency })
+        
+const payment = await PaymentModel.create({
+    user:req.user._id,
+    razorpay:{
+        orderId:order.id,
+    },
+    price:{
+        amount:cart.totalPrice,
+        currency:cart.currency
+    },
+   orderItems:cart.items.map(items=>({
+    productId:items.product._id,
+    variant:items.variant,
+    quantity:items.quantity,
+    title:items.product.title,
+    images:items.product.variants.images || items.product.images,
+    description:items.product.description || items.product.description,
+    price:{
+       amount:items.product.variants.price.amount || items.product.price.ammount,
+       currency:items.product.variants.price.currency || items.product.price.currency,
+    },
+   }))
+})
 
         return res.status(200).json({
             message: "Order created successfully",

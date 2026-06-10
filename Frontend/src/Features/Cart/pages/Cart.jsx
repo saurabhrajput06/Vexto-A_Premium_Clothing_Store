@@ -338,7 +338,7 @@ const OrderSummary = ({ items, navigate }) => {
         contact: user?.contact,
       },
       theme: {
-        color: "#171717",
+        color: "#1e293b",
       },
     };
 
