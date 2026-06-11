@@ -4,7 +4,7 @@ import { useCart } from '../Hook/useCart'
 import { useNavigate } from 'react-router'
 import Footer from '../../shared/Footer'
 import Navbar from '../../shared/Navbar'
-import { useRazorpay} from "react-razorpay";
+import { useRazorpay } from "react-razorpay";
 
 
 
@@ -123,7 +123,7 @@ const getVariantStock = (item) => {
 const CartItem = ({ item, onRemove, onUpdateQuantity, removingId }) => {
   const [imgIdx, setImgIdx] = useState(0);
   const [hovered, setHovered] = useState(false);
-  
+
   const images = getItemImages(item);
   const hasMultiple = images.length > 1;
   const price = getItemPrice(item);
@@ -145,65 +145,65 @@ const CartItem = ({ item, onRemove, onUpdateQuantity, removingId }) => {
       <div className="flex flex-col sm:flex-row sm:items-center gap-5 w-full">
         {/* Product Area */}
         <div className="flex-1 flex gap-5 sm:gap-7 min-w-0">
-        {/* Image */}
-        <div 
-          className="relative w-[100px] h-[130px] sm:w-[130px] sm:h-[165px] bg-neutral-100 rounded-xl overflow-hidden shrink-0 shadow-sm"
-          onMouseEnter={() => setHovered(true)}
-          onMouseLeave={() => setHovered(false)}
-        >
-          {images.length > 0 ? (
-            <img
-              src={images[imgIdx]?.url}
-              alt={item.product?.title}
-              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-            />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center text-neutral-300 text-2xl">
-              🖼
-            </div>
-          )}
-
-          {/* Mini carousel arrows */}
-          {hasMultiple && (
-            <div className={`absolute inset-0 flex items-center justify-between px-1 transition-opacity duration-300 ${hovered ? 'opacity-100' : 'opacity-0'}`}>
-              <button onClick={prev} className="p-1 bg-white/80 hover:bg-white text-neutral-800 rounded-full backdrop-blur-sm transition-colors shadow-sm">
-                <ChevronLeftIcon />
-              </button>
-              <button onClick={next} className="p-1 bg-white/80 hover:bg-white text-neutral-800 rounded-full backdrop-blur-sm transition-colors shadow-sm">
-                <ChevronRightIcon />
-              </button>
-            </div>
-          )}
-
-          {/* Image dots */}
-          {hasMultiple && (
-            <div className="absolute bottom-1.5 left-0 right-0 flex justify-center gap-1">
-              {images.map((_, i) => (
-                <span
-                  key={i}
-                  className={`block w-1 h-1 rounded-full transition-all ${i === imgIdx ? 'bg-white w-2.5' : 'bg-white/40'}`}
-                />
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* Info */}
-        <div className="flex-1 flex flex-col justify-between py-0.5 min-w-0">
-          <div>
-            <div className="flex items-start justify-between gap-2">
-              <div className="min-w-0">
-                <h3 className="text-sm font-semibold text-neutral-900 uppercase tracking-[0.08em] truncate group-hover:text-neutral-700 transition-colors">
-                  {item.product?.title}
-                </h3>
-                {variantLabel && (
-                  <div className="mt-2.5 inline-block bg-[#d4af8a]/15 border border-[#d4af8a]/30 px-2.5 py-1 rounded-md shadow-sm">
-                    <p className="text-[10px] text-[#a6825c] uppercase tracking-[0.15em] font-bold">
-                      {variantLabel}
-                    </p>
-                  </div>
-                )}
+          {/* Image */}
+          <div
+            className="relative w-[100px] h-[130px] sm:w-[130px] sm:h-[165px] bg-neutral-100 rounded-xl overflow-hidden shrink-0 shadow-sm"
+            onMouseEnter={() => setHovered(true)}
+            onMouseLeave={() => setHovered(false)}
+          >
+            {images.length > 0 ? (
+              <img
+                src={images[imgIdx]?.url}
+                alt={item.product?.title}
+                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center text-neutral-300 text-2xl">
+                🖼
               </div>
+            )}
+
+            {/* Mini carousel arrows */}
+            {hasMultiple && (
+              <div className={`absolute inset-0 flex items-center justify-between px-1 transition-opacity duration-300 ${hovered ? 'opacity-100' : 'opacity-0'}`}>
+                <button onClick={prev} className="p-1 bg-white/80 hover:bg-white text-neutral-800 rounded-full backdrop-blur-sm transition-colors shadow-sm">
+                  <ChevronLeftIcon />
+                </button>
+                <button onClick={next} className="p-1 bg-white/80 hover:bg-white text-neutral-800 rounded-full backdrop-blur-sm transition-colors shadow-sm">
+                  <ChevronRightIcon />
+                </button>
+              </div>
+            )}
+
+            {/* Image dots */}
+            {hasMultiple && (
+              <div className="absolute bottom-1.5 left-0 right-0 flex justify-center gap-1">
+                {images.map((_, i) => (
+                  <span
+                    key={i}
+                    className={`block w-1 h-1 rounded-full transition-all ${i === imgIdx ? 'bg-white w-2.5' : 'bg-white/40'}`}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Info */}
+          <div className="flex-1 flex flex-col justify-between py-0.5 min-w-0">
+            <div>
+              <div className="flex items-start justify-between gap-2">
+                <div className="min-w-0">
+                  <h3 className="text-sm font-semibold text-neutral-900 uppercase tracking-[0.08em] truncate group-hover:text-neutral-700 transition-colors">
+                    {item.product?.title}
+                  </h3>
+                  {variantLabel && (
+                    <div className="mt-2.5 inline-block bg-[#d4af8a]/15 border border-[#d4af8a]/30 px-2.5 py-1 rounded-md shadow-sm">
+                      <p className="text-[10px] text-[#a6825c] uppercase tracking-[0.15em] font-bold">
+                        {variantLabel}
+                      </p>
+                    </div>
+                  )}
+                </div>
                 <button
                   onClick={() => onRemove(item._id)}
                   className="sm:hidden p-1.5 text-neutral-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all duration-200 shrink-0"
@@ -229,7 +229,7 @@ const CartItem = ({ item, onRemove, onUpdateQuantity, removingId }) => {
                 )}
               </div>
             </div>
-            
+
             {/* Desktop Remove Button */}
             <button
               onClick={() => onRemove(item._id)}
@@ -264,7 +264,7 @@ const CartItem = ({ item, onRemove, onUpdateQuantity, removingId }) => {
               </button>
             </div>
           </div>
-          
+
           <div className="sm:w-24 text-right shrink-0">
             <span className="text-sm font-bold text-neutral-900 tracking-tight">
               {formatPrice(lineTotal, currency)}
@@ -304,22 +304,22 @@ const OrderSummary = ({ items, navigate }) => {
   const subtotal = items.reduce((sum, item) => {
     return sum + getItemPrice(item) * item.quantity;
   }, 0);
-  
+
   const currency = items.length > 0 ? getItemCurrency(items[0]) : "INR";
   const shipping = subtotal > 999 ? 0 : 99;
   const total = subtotal + shipping;
   const itemCount = items.reduce((sum, item) => sum + item.quantity, 0);
   const shippingProgress = Math.min(100, (subtotal / 1000) * 100);
-  
-  
-  const { handlePayment } = useCart();
+
+
+  const { handlePayment, handleVerifyPaymentOrder } = useCart();
   const { Razorpay } = useRazorpay();
   const user = useSelector((state) => state.auth.user);
 
   async function handleCheckout() {
     const order = await handlePayment();
     console.log("order is", order);
-    
+
     const options = {
       key: "rzp_test_SzmMgjTVFCeVog",
       amount: order.amount, // Amount in paise
@@ -327,9 +327,14 @@ const OrderSummary = ({ items, navigate }) => {
       name: "Vexto - Premium Collection",
       description: "Payment",
       order_id: order.id, //Generate order_id on server
-      handler: (response) => {
-        console.log(response);
-        alert("Payment Successful!!");
+      handler: async (response) => {
+        const isValid = await handleVerifyPaymentOrder(response)
+        if (isValid) {
+          navigate(`/order-sucess?order_id=${response?.razorpay_order_id || response?.razorpayOrderId}&payment_id=${response?.razorpay_payment_id || response?.razorpayPaymentId}`, { state: { order, items } })
+        }
+        else {
+          alert("Payment verification failed")
+        }
 
       },
       prefill: {
@@ -368,15 +373,15 @@ const OrderSummary = ({ items, navigate }) => {
               <span className="font-semibold text-neutral-900">{formatPrice(shipping, currency)}</span>
             )}
           </div>
-          
+
           {shipping > 0 && (
             <div className="bg-white rounded-xl px-4 py-3.5 border border-dashed border-neutral-200/80 transition-colors hover:border-neutral-400">
               <p className="text-xs text-neutral-400 leading-relaxed">
                 Add <span className="font-bold text-neutral-900">{formatPrice(1000 - subtotal, currency)}</span> more for <span className="font-bold text-emerald-600">free shipping</span>
               </p>
               <div className="mt-2.5 h-1 bg-neutral-200 rounded-full overflow-hidden">
-                <div 
-                  className="h-full bg-gradient-to-r from-neutral-900 to-neutral-600 rounded-full transition-all duration-700 ease-out" 
+                <div
+                  className="h-full bg-gradient-to-r from-neutral-900 to-neutral-600 rounded-full transition-all duration-700 ease-out"
                   style={{ width: `${shippingProgress}%` }}
                 />
               </div>
@@ -521,7 +526,7 @@ const Cart = () => {
                 <span className="w-28 text-center">Quantity</span>
                 <span className="w-24 text-right">Total</span>
               </div>
-              
+
               <div className="flex flex-col gap-2 mt-2">
                 {cartItems.map((item) => (
                   <CartItem

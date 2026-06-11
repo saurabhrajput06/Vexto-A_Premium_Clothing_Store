@@ -6,7 +6,7 @@ import { createOrder } from "../Services/payment.service.js";
 import mongoose from "mongoose";
 import { getCartDetails } from "../Dao/cart.dao.js";
 import PaymentModel from "../Models/payment.model.js";
-
+import { validatePaymentVerification } from "../Utils/razorpay.js";
 
 
 export const addToCart = async (req, res) => {
@@ -263,3 +263,69 @@ const payment = await PaymentModel.create({
         return res.status(500).json({ message: " error in payments", success: false })
     }
 }
+
+export const verifyPaymentOrder = async (req, res) => {
+    try {
+        const {
+            razorpayOrderId,
+            razorpayPaymentId,
+            razorpaySignature,
+    
+        } = req.body
+
+        const payment = await PaymentModel.findOne(
+            { 
+            "razorpay.orderId": razorpayOrderId ,
+            status:"pending"
+
+        })
+        if(!payment){
+            return res.status(404).json({message:"payment not found",success:false})
+        }
+
+        const isPaymentValid = validatePaymentVerification({
+            razorpay_order_id: razorpayOrderId,
+            razorpay_payment_id: razorpayPaymentId,
+        },razorpaySignature,process.env.RAZORPAY_KEY_SECRET)
+
+        if(!isPaymentValid){
+            payment.status ="failed"
+            await payment.save()
+            return res.status(400).json({message:"payment verfication failed",success:false})
+        }
+
+        payment.status = "paid"
+        payment.razorpay.paymentId = razorpayPaymentId
+        payment.razorpay.signature = razorpaySignature
+        await payment.save()
+
+        return res.status(200).json({message:"Payment verified successfully",success:true})
+
+    } catch (error) {
+        console.log(error)
+        return res.status(500).json({message:"error in payment verfication",success:false})
+        
+    }
+}
+
+export const getPaymentDetails = async (req, res) => {
+    try {
+        const { orderId } = req.params;
+        const payment = await PaymentModel.findOne({
+            "razorpay.orderId": orderId,
+            user: req.user._id
+        });
+
+        if (!payment) {
+            return res.status(404).json({ message: "Order not found", success: false });
+        }
+
+        return res.status(200).json({
+            success: true,
+            payment
+        });
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({ message: "Error fetching order details", success: false });
+    }
+};

@@ -1,7 +1,7 @@
 import express from "express"
 import { AuthenticateUser } from "../Middleware/auth.middleware.js";
 import { validateAddToCart, validateUpdateCartItem, validateRemoveFromCart } from "../Validator/cart.validator.js";
-import { addToCart, getCart, removeFromCart, updateCartItem ,createPaymentOrder } from "../Controllers/cart.controler.js";
+import { addToCart, getCart, removeFromCart, updateCartItem ,createPaymentOrder, verifyPaymentOrder, getPaymentDetails } from "../Controllers/cart.controler.js";
 
 
 
@@ -32,5 +32,8 @@ router.patch("/item/:itemId", AuthenticateUser, validateUpdateCartItem, updateCa
 
 router.post("/payment/create/order", AuthenticateUser, createPaymentOrder)
 
+router.post("/payment/verify/order", AuthenticateUser,verifyPaymentOrder )
+
+router.get("/payment/order/:orderId", AuthenticateUser, getPaymentDetails)
 
 export default router

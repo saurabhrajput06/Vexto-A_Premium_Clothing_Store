@@ -1,6 +1,6 @@
 import { useDispatch } from "react-redux";
 import { setItems, addItems, removeItem as removeItemAction, updateItemQuantity, setLoading } from "../State/cart.slice";
-import { addItem, getCart, removeItem, updateItem,createPaymentOrder } from "../Service/cart.api";
+import { addItem, getCart, removeItem, updateItem,createPaymentOrder, verifyPaymentOrder, getPaymentOrderDetails} from "../Service/cart.api";
 
 
 export const useCart = () => {
@@ -77,12 +77,41 @@ export const useCart = () => {
         }
     }
 
+
+  async function handleVerifyPaymentOrder(response){
+    try{
+        const razorpayOrderId = response.razorpay_order_id || response.razorpayOrderId;
+        const razorpayPaymentId = response.razorpay_payment_id || response.razorpayPaymentId;
+        const razorpaySignature = response.razorpay_signature || response.razorpaySignature;
+        const data = await verifyPaymentOrder({razorpayOrderId,razorpayPaymentId,razorpaySignature})
+        return data.success
+    }
+    catch(error){
+        console.log("error in handleVerifyPaymentOrder", error)
+        return error
+    }
+ }
+
+ async function handleGetPaymentOrderDetails(orderId) {
+     try {
+         const data = await getPaymentOrderDetails(orderId)
+         return data.payment
+     } catch (error) {
+         console.log("error in handleGetPaymentOrderDetails", error)
+         return null
+     }
+ }
+
+
+
     return {
         handleAddToCart,
         handleGetCart,
         handleRemoveItem,
         handleUpdateQuantity,
-        handlePayment
+        handlePayment,
+        handleVerifyPaymentOrder,
+        handleGetPaymentOrderDetails
     };
 
 }

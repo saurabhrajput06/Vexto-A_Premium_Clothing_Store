@@ -5,6 +5,7 @@ import RootPage from "./RootPage";
 import CreateProduct from "../Features/Products/Pages/CreateProduct";
 import Dashboard from "../Features/Products/Pages/Dashboard";
 import Cart from "../Features/Cart/pages/Cart";
+import OrderSuccesss from "../Features/Cart/pages/OrderSuccesss";
 import MyAccount from "../Features/Account/pages/MyAccount";
 import Wishlist from "../Features/Wishlist/pages/wishlist";
 
@@ -35,6 +36,12 @@ export const router = createBrowserRouter([
         path: "/cart",
         element: <Protected>
             <Cart />
+        </Protected>
+    },
+    {
+        path: "/order-sucess",
+        element: <Protected>
+            <OrderSuccesss />
         </Protected>
     },
     {
