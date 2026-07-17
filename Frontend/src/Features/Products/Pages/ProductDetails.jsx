@@ -6,6 +6,7 @@ import { useCart } from "../../Cart/Hook/useCart";
 import { useWishlist } from "../../Wishlist/Hook/useWishlist";
 import Footer from "../../shared/Footer";
 import Navbar from "../../shared/Navbar";
+import Loader from "../../shared/Loader";
 
 
 /* ── Icons ── */
@@ -153,11 +154,7 @@ const ProductDetails = () => {
   }, [id]);
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-neutral-200 border-t-neutral-900 rounded-full animate-spin"></div>
-      </div>
-    );
+    return <Loader text="Retrieving product details" />;
   }
 
   if (!product) {

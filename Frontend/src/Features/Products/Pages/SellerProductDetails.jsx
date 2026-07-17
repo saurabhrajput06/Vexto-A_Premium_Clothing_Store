@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useProduct } from '../hook/useProduct';
 import { useParams } from 'react-router';
 import Footer from '../../shared/Footer';
+import Loader from '../../shared/Loader';
 
 const SellerProductDetails = () => {
     const { handleGetProductById, handleCreateProductVariant, handleUpdateVariantStock } = useProduct();
@@ -99,7 +100,7 @@ const SellerProductDetails = () => {
     };
 
     if (loading) {
-        return <div className="min-h-screen bg-gray-50 flex items-center justify-center">Loading...</div>;
+        return <Loader text="Loading dashboard details" />;
     }
 
     if (!product) {

@@ -1,12 +1,13 @@
 import {useSelector} from "react-redux";
 import {Navigate} from "react-router";
+import Loader from "../../shared/Loader";
 
 
 function Protected({children , role = "buyer"}){
     const {user , loading} = useSelector(state => state.auth)
 
     if(loading){
-        return <div>loading...</div>
+        return <Loader />
     }
     if(!user){
         return <Navigate to="/login" />

@@ -4,6 +4,7 @@ import { useDispatch } from 'react-redux'
 import { useCart } from '../Hook/useCart'
 import Navbar from '../../shared/Navbar'
 import Footer from '../../shared/Footer'
+import Loader from '../../shared/Loader'
 
 /* ── Custom SVG Icons ── */
 const CheckIcon = () => (
@@ -195,14 +196,7 @@ const OrderSuccesss = () => {
     };
 
     if (loading) {
-        return (
-            <div className="min-h-screen bg-white flex items-center justify-center font-sans text-neutral-900">
-                <div className="flex flex-col items-center gap-4">
-                    <div className="w-8 h-8 border-2 border-neutral-200 border-t-neutral-900 rounded-full animate-spin"></div>
-                    <span className="text-[10px] font-semibold uppercase tracking-[0.3em] text-neutral-400 animate-pulse">Retrieving order details</span>
-                </div>
-            </div>
-        );
+        return <Loader text="Retrieving order details" />;
     }
 
     return (
