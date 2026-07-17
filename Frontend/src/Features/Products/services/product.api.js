@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const productApi = axios.create({
-    baseURL:"/api/products",
+    baseURL:"https://vexto-backend.onrender.com/api/products",
     withCredentials:true
 })
 
@@ -46,4 +46,4 @@ export async function updateProductVariantStock(productId, variantId, stock) {
 export async function addProductReview(productId, { rating, comment }) {
     const response = await productApi.post(`/${productId}/reviews`, { rating, comment });
     return response.data;
-}
+}

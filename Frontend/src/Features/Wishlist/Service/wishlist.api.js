@@ -1,7 +1,7 @@
 import axios from "axios"
 
 const wishlistApiInstance = axios.create({
-    baseURL:"http://localhost:3000/api/wishlist",
+    baseURL:"https://vexto-backend.onrender.com/api/wishlist",
     withCredentials:true
 })
 

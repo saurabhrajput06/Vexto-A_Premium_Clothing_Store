@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const cartApiInstance = axios.create({
-    baseURL: "http://localhost:3000/api/cart",
+    baseURL: "https://vexto-backend.onrender.com/api/cart",
     withCredentials: true,
 
 })
