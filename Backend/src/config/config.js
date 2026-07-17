@@ -37,5 +37,6 @@ export const config = {
     imagekit_private_key:process.env.IMAGEKIT_PRIVATE_KEY,
     razorpay_key_id:process.env.RAZORPAY_KEY_ID,
     razorpay_key_secret:process.env.RAZORPAY_KEY_SECRET,
-    frontend_url: process.env.FRONTEND_URL || "http://localhost:5173"
+    frontend_url: process.env.FRONTEND_URL || "https://vexto-frontend.onrender.com",
+    port:process.env.PORT || 3000
 };

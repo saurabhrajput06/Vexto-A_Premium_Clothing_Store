@@ -9,18 +9,14 @@ const authApiInstance=axios.create({
 
 
 export async function register({email , fullname ,contact , password,isSeller}){
-    try{
-        const response=await authApiInstance.post("/register",{
-            email ,
-            contact,
-            password,
-            fullname,
-            isSeller
-        }) 
-        return response.data;
-    }catch(error){
-        throw error;
-    }
+    const response=await authApiInstance.post("/register",{
+        email ,
+        contact,
+        password,
+        fullname,
+        isSeller
+    }) 
+    return response.data;
 }
 
 export async function login({ email , password}){

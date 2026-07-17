@@ -1,5 +1,5 @@
 import { useDispatch } from "react-redux";
-import { setItems, addItems, removeItem as removeItemAction, updateItemQuantity, setLoading } from "../State/cart.slice";
+import { setItems, removeItem as removeItemAction, updateItemQuantity, setLoading } from "../State/cart.slice";
 import { addItem, getCart, removeItem, updateItem,createPaymentOrder, verifyPaymentOrder, getPaymentOrderDetails} from "../Service/cart.api";
 
 

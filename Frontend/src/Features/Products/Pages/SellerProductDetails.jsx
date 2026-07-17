@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useProduct } from '../hook/useProduct';
-import { useNavigate, useParams } from 'react-router';
+import { useParams } from 'react-router';
 import Footer from '../../shared/Footer';
 
 const SellerProductDetails = () => {
@@ -13,7 +13,7 @@ const SellerProductDetails = () => {
     const [images, setImages] = useState([]);
     const [stock, setStock] = useState('');
     const [priceAmount, setPriceAmount] = useState('');
-    const [priceCurrency, setPriceCurrency] = useState('INR');
+    const priceCurrency = 'INR';
     const [attributes, setAttributes] = useState([{ key: '', value: '' }]);
     const [isCreatingVariant, setIsCreatingVariant] = useState(false);
 
@@ -28,8 +28,21 @@ const SellerProductDetails = () => {
     };
 
     useEffect(() => {
-        fetchProduct();
-    }, [id]);
+        let active = true;
+        const load = async () => {
+            await Promise.resolve();
+            if (!active) return;
+            setLoading(true);
+            const data = await handleGetProductById(id);
+            if (!active) return;
+            setProduct(data);
+            setLoading(false);
+        };
+        load();
+        return () => {
+            active = false;
+        };
+    }, [id, handleGetProductById]);
 
     const handleAddAttribute = () => setAttributes([...attributes, { key: '', value: '' }]);
     

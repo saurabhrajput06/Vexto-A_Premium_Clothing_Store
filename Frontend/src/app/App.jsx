@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import { RouterProvider } from 'react-router'
 import {router} from './app.route'
 import './App.css'

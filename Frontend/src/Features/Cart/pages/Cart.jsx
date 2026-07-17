@@ -108,8 +108,7 @@ const getItemCurrency = (item) => {
 const getVariantLabel = (item) => {
   const variant = getVariantData(item);
   if (!variant?.attributes || Object.keys(variant.attributes).length === 0) return null;
-  return Object.entries(variant.attributes)
-    .map(([key, value]) => `${value}`)
+  return Object.values(variant.attributes)
     .join(" · ");
 };
 
@@ -440,7 +439,7 @@ const Cart = () => {
   const cartItems = useSelector(state => state.cart.items)
   const cartLoading = useSelector(state => state.cart.loading)
   const navigate = useNavigate()
-  const { handleGetCart, handleRemoveItem, handleUpdateQuantity, handlePayment } = useCart()
+  const { handleGetCart, handleRemoveItem, handleUpdateQuantity } = useCart()
   const [removingId, setRemovingId] = useState(null)
 
 

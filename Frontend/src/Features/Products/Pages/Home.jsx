@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { useProduct } from "../hook/useProduct";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router";
-import { useAuth } from "../../Auth/Hook/UseAuth";
 import { useCart } from "../../Cart/Hook/useCart";
 import { useWishlist } from "../../Wishlist/Hook/useWishlist";
 import Footer from "../../shared/Footer";
@@ -109,52 +108,83 @@ const ProductCard = ({ product, onClick, onQuickAdd, isWishlisted, onToggleWishl
   const [hovered, setHovered] = useState(false);
   const images = product.images || [];
   const hasMultiple = images.length > 1;
-  const [colors, setColors] = useState({
-    bg: "transparent",
-    border: "transparent",
-    shadow: "rgba(0, 0, 0, 0.08)"
+  const [prevProductId, setPrevProductId] = useState(product._id);
+  const [colors, setColors] = useState(() => {
+    if (product?._id && colorCache[product._id]) {
+      return colorCache[product._id];
+    }
+    return {
+      bg: "transparent",
+      border: "transparent",
+      shadow: "rgba(0, 0, 0, 0.08)"
+    };
   });
+
+  if (product._id !== prevProductId) {
+    setPrevProductId(product._id);
+    if (product._id && colorCache[product._id]) {
+      setColors(colorCache[product._id]);
+    } else {
+      setColors({
+        bg: "transparent",
+        border: "transparent",
+        shadow: "rgba(0, 0, 0, 0.08)"
+      });
+    }
+  }
 
   useEffect(() => {
     if (!product._id) return;
-    if (colorCache[product._id]) {
-      setColors(colorCache[product._id]);
-      return;
-    }
+    if (colorCache[product._id]) return;
 
-    if (images.length === 0) {
-      const defaultColors = getHashColors(product.title || product._id || "Product");
-      colorCache[product._id] = defaultColors;
-      setColors(defaultColors);
-      return;
-    }
+    let active = true;
 
-    const imageUrl = images[0].url;
-    const img = new Image();
-    img.crossOrigin = "anonymous";
-    img.onload = () => {
-      try {
-        const canvas = document.createElement("canvas");
-        canvas.width = 1;
-        canvas.height = 1;
-        const ctx = canvas.getContext("2d");
-        ctx.drawImage(img, 0, 0, 1, 1);
-        const [r, g, b] = ctx.getImageData(0, 0, 1, 1).data;
-        const extractedColors = getPastelColors(r, g, b);
-        colorCache[product._id] = extractedColors;
-        setColors(extractedColors);
-      } catch (e) {
+    const extractColors = async () => {
+      await Promise.resolve();
+      if (!active) return;
+
+      if (images.length === 0) {
+        const defaultColors = getHashColors(product.title || product._id || "Product");
+        colorCache[product._id] = defaultColors;
+        setColors(defaultColors);
+        return;
+      }
+
+      const imageUrl = images[0].url;
+      const img = new Image();
+      img.crossOrigin = "anonymous";
+      img.onload = () => {
+        if (!active) return;
+        try {
+          const canvas = document.createElement("canvas");
+          canvas.width = 1;
+          canvas.height = 1;
+          const ctx = canvas.getContext("2d");
+          ctx.drawImage(img, 0, 0, 1, 1);
+          const [r, g, b] = ctx.getImageData(0, 0, 1, 1).data;
+          const extractedColors = getPastelColors(r, g, b);
+          colorCache[product._id] = extractedColors;
+          setColors(extractedColors);
+        } catch {
+          const hashColors = getHashColors(product.title || product._id || "Product");
+          colorCache[product._id] = hashColors;
+          setColors(hashColors);
+        }
+      };
+      img.onerror = () => {
+        if (!active) return;
         const hashColors = getHashColors(product.title || product._id || "Product");
         colorCache[product._id] = hashColors;
         setColors(hashColors);
-      }
+      };
+      img.src = imageUrl;
     };
-    img.onerror = () => {
-      const hashColors = getHashColors(product.title || product._id || "Product");
-      colorCache[product._id] = hashColors;
-      setColors(hashColors);
+
+    extractColors();
+
+    return () => {
+      active = false;
     };
-    img.src = imageUrl;
   }, [images, product.title, product._id]);
 
   const prev = (e) => { e.stopPropagation(); setImgIdx(i => (i === 0 ? images.length - 1 : i - 1)); };
@@ -270,18 +300,11 @@ const ProductCard = ({ product, onClick, onQuickAdd, isWishlisted, onToggleWishl
 
 /* ── Hero ── */
 const Hero = () => {
-  const navigate = useNavigate();
-
   const handleShopCollection = () => {
     // Open the Navbar search bar via custom event
     window.dispatchEvent(new Event("open-search"));
     // Also scroll up so the search bar is visible
     window.scrollTo({ top: 0, behavior: "smooth" });
-  };
-
-  const handleBrowseCategories = () => {
-    const el = document.getElementById("product-section");
-    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
   return (
@@ -328,7 +351,6 @@ const Home = () => {
   const { handleGetAllProducts } = useProduct();
   const products = useSelector(state => state.product.products);
   const user = useSelector(state => state.auth.user);
-  const cartItems = useSelector(state => state.cart.items);
   const navigate = useNavigate();
   const { handleAddToCart, handleGetCart } = useCart();
 
@@ -343,7 +365,7 @@ const Home = () => {
     handleGetCart();
   }, []);
 
-  const cartCount = (cartItems || []).reduce((sum, item) => sum + item.quantity, 0);
+
 
   const onToggleWishlist = async (productId) => {
     if (!user) {

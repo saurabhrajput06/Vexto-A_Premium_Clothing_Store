@@ -132,7 +132,7 @@ const ProductDetails = () => {
         setToastType("error");
         setToastMessage(result?.message || "Failed to update wishlist");
       }
-    } catch (err) {
+    } catch {
       setToastType("error");
       setToastMessage("Something went wrong");
     }
@@ -225,7 +225,7 @@ const ProductDetails = () => {
         setToastType("error");
         setToastMessage(result?.message || "Could not add to bag");
       }
-    } catch (err) {
+    } catch {
       setToastType("error");
       setToastMessage("Something went wrong");
     }
@@ -360,7 +360,7 @@ const ProductDetails = () => {
                     {variants.map((variant) => {
                       // Generate a label from attributes, e.g., "Red / M"
                       const label = variant.attributes && Object.keys(variant.attributes).length > 0
-                        ? Object.entries(variant.attributes).map(([k, v]) => `${v}`).join(' / ')
+                        ? Object.values(variant.attributes).join(' / ')
                         : `Variant`;
 
                       const isSelected = selectedVariant?._id === variant._id;

@@ -6,23 +6,22 @@ import productRoutes from "./Routes/product.routes.js";
 import cartRoutes from "./Routes/cart.route.js";
 import cors from "cors";
 import wishlistRoutes from "./Routes/wishlist.route.js";
-
+import {config} from "./config/config.js";
 
 
 //GoogleAuthentication
 import passport from "passport";
 import {Strategy as GoogleStrategy} from "passport-google-oauth20";
-import {config} from "./config/config.js";
 
 
 
 
 const app = express();
 
+
 app.use(cors({
-    origin: config.frontend_url,
-    methods:["GET","POST","PUT","DELETE","PATCH"],
-    credentials:true,
+  origin: "https://vexto-frontend.onrender.com", 
+  credentials: true 
 }));
 
 

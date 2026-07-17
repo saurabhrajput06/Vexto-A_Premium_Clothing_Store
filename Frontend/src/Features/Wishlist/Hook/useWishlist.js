@@ -1,6 +1,6 @@
 import {useDispatch , useSelector} from "react-redux";
 import { toggleWishlist , getWishlist } from "../Service/wishlist.api";
-import { setItems, addItem, removeItem, setLoading, setError } from "../State/wishlist.slice";
+import { setItems, setLoading } from "../State/wishlist.slice";
 
 export const useWishlist = () => {
     const dispatch = useDispatch()

@@ -18,7 +18,6 @@ const Welcome = () => {
   const navigate = useNavigate();
   const { user } = useSelector((state) => state.auth);
   const [currentSlide, setCurrentSlide] = useState(0);
-  const [isLoaded, setIsLoaded] = useState(false);
 
   // Auto-advance slideshow
   useEffect(() => {
@@ -26,12 +25,6 @@ const Welcome = () => {
       setCurrentSlide((prev) => (prev + 1) % MODEL_IMAGES.length);
     }, SLIDE_INTERVAL);
     return () => clearInterval(timer);
-  }, []);
-
-  // Trigger mount animation
-  useEffect(() => {
-    const t = setTimeout(() => setIsLoaded(true), 100);
-    return () => clearTimeout(t);
   }, []);
 
   const handleExplore = () => {

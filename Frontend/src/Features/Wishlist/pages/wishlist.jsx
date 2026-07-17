@@ -206,7 +206,7 @@ const Wishlist = () => {
           triggerToast("Failed to remove some items from wishlist", "error");
           setRemovingIds((prev) => prev.filter((id) => id !== itemId));
         }
-      } catch (err) {
+      } catch {
         triggerToast("Failed to remove item", "error");
         setRemovingIds((prev) => prev.filter((id) => id !== itemId));
       }
@@ -241,7 +241,7 @@ const Wishlist = () => {
           return copy;
         });
       }
-    } catch (err) {
+    } catch {
       triggerToast("Something went wrong", "error");
       setAddingIds((prev) => {
         const copy = { ...prev };
@@ -347,7 +347,7 @@ const Wishlist = () => {
                 // Extract correct attributes, image and price fallback
                 const hasAttributes = item.variant?.attributes && Object.keys(item.variant.attributes).length > 0;
                 const attributesLabel = hasAttributes
-                  ? Object.entries(item.variant.attributes).map(([_, val]) => val).join(" / ")
+                  ? Object.values(item.variant.attributes).join(" / ")
                   : "";
 
                 const imageUrl = item.variant?.images?.[0]?.url || product.images?.[0]?.url || "";

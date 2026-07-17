@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useSearchParams, useLocation, useNavigate } from 'react-router'
 import { useDispatch } from 'react-redux'
-import { setItems } from '../State/cart.slice'
 import { useCart } from '../Hook/useCart'
 import Navbar from '../../shared/Navbar'
 import Footer from '../../shared/Footer'
@@ -69,12 +68,13 @@ const OrderSuccesss = () => {
                     const priceVal = variant?.price?.amount ?? item.product?.price?.amount ?? 0;
                     return sum + priceVal * item.quantity;
                 }, 0);
+                const firstItem = initialItems[0];
                 const tempCurrency = initialItems.length > 0
-                    ? (item.variant && item.product?.variants
-                        ? (Array.isArray(item.product.variants)
-                            ? item.product.variants.find(v => v._id === item.variant)?.price?.currency
-                            : item.product.variants.price?.currency)
-                        : null) || item.product?.price?.currency || "INR"
+                    ? (firstItem.variant && firstItem.product?.variants
+                        ? (Array.isArray(firstItem.product.variants)
+                            ? firstItem.product.variants.find(v => v._id === firstItem.variant)?.price?.currency
+                            : firstItem.product.variants.price?.currency)
+                        : null) || firstItem.product?.price?.currency || "INR"
                     : "INR";
 
                 setOrderData({
@@ -156,8 +156,7 @@ const OrderSuccesss = () => {
     const getVariantLabel = (item) => {
         const variant = getVariantData(item);
         if (!variant?.attributes || Object.keys(variant.attributes).length === 0) return null;
-        return Object.entries(variant.attributes)
-            .map(([key, value]) => `${value}`)
+        return Object.values(variant.attributes)
             .join(" · ");
     };
 

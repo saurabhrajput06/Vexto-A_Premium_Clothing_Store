@@ -87,7 +87,6 @@ const Navbar = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const isHome = location.pathname === '/';
   const transparent = false;
 
   const navBg = isScrolled

@@ -62,7 +62,7 @@ const MAX_IMAGES = 7;
 /* ------------------------------------------------------------------ */
 /*  ImageSlot sub-component                                             */
 /* ------------------------------------------------------------------ */
-const ImageSlot = ({ index, isPrimary, file, previewUrl, onFile, onRemove }) => {
+const ImageSlot = ({ index, isPrimary, previewUrl, onFile, onRemove }) => {
   const inputRef = useRef(null);
 
   const handleDrop = (e) => {
