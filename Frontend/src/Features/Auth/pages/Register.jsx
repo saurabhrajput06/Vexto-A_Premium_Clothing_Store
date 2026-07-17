@@ -5,8 +5,8 @@ import {useNavigate} from "react-router";
 import ContinueWithGoogle from '../components/ContinueWithGoogle';
 
 const Register = () => {
- const {handleRegister}=useAuth();
- const navigate=useNavigate();
+  const {handleRegister}=useAuth();
+  const navigate=useNavigate();
 
   const [formData, setFormData] = useState({
     fullname: '',
@@ -15,6 +15,7 @@ const Register = () => {
     password: '',
     isSeller: false
   });
+  const [error, setError] = useState('');
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -26,16 +27,23 @@ const Register = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await handleRegister({
-        email:formData.email,
-        contact:formData.contact,
-        password:formData.password,
-        fullname:formData.fullname,
-        isSeller:formData.isSeller
-
-    })
-    navigate("/");
-    console.log("Registering...", formData);
+    setError('');
+    try {
+      await handleRegister({
+          email:formData.email,
+          contact:formData.contact,
+          password:formData.password,
+          fullname:formData.fullname,
+          isSeller:formData.isSeller
+      });
+      navigate("/");
+      console.log("Registering...", formData);
+    } catch (err) {
+      console.error("Register Error:", err);
+      // Retrieve the message from direct response error, validation errors array, or general error message
+      const apiError = err.response?.data?.message || err.response?.data?.errors?.[0]?.msg || err.message || "Registration failed. Please try again.";
+      setError(apiError);
+    }
   };
 
   return (
@@ -80,6 +88,12 @@ const Register = () => {
               Join our exclusive platform today
             </p>
           </div>
+
+          {error && (
+            <div className="bg-red-50 text-red-600 p-4 rounded-sm border border-red-200 text-sm mb-6 font-medium">
+              {error}
+            </div>
+          )}
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

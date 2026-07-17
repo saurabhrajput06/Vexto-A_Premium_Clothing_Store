@@ -28,7 +28,7 @@ export const validateRegister=[
     
     body("contact")
     .notEmpty().withMessage("Contact is required")
-    .matches(/^\d{10}$/).withMessage("Contact must be 10 digits long"),
+    .matches(/^\+?\d{10,13}$/).withMessage("Contact must be a valid 10 to 13 digit number"),
     
     
     body("isSeller")
