@@ -20,7 +20,7 @@ import {config} from "./config/config.js";
 const app = express();
 
 app.use(cors({
-    origin:"http://localhost:5173",
+    origin: config.frontend_url,
     methods:["GET","POST","PUT","DELETE","PATCH"],
     credentials:true,
 }));

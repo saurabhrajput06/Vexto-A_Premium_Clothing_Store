@@ -1,9 +1,13 @@
 import React from 'react';
 
 const ContinueWithGoogle = () => {
+  const backendBaseUrl = window.location.hostname === "localhost"
+    ? "http://localhost:3000"
+    : "https://vexto-backend.onrender.com";
+
   return (
     <a
-      href="http://localhost:3000/api/auth/google"
+      href={`${backendBaseUrl}/api/auth/google`}
       className="flex items-center justify-center w-full px-4 py-[10px] sm:py-[12px] bg-white border border-[#dadce0] rounded-md shadow-sm transition-colors duration-200 hover:bg-[#F8F9FA] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#4285F4] focus:ring-offset-[#121212] active:bg-[#E8EAED]"
     >
       <div className="flex items-center justify-center bg-white flex-shrink-0">

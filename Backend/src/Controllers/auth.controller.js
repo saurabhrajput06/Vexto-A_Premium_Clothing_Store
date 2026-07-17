@@ -8,7 +8,13 @@ async function sendTokenResponse(user , res , message){
     const token = jwt.sign({id:user._id },
         config.jwt_secret,{expiresIn:"7d"}
     );
-res.cookie("token",token)
+    const isDev = config.NODE_ENV.startsWith("dev");
+    res.cookie("token", token, {
+        secure: !isDev,
+        sameSite: !isDev ? "none" : "lax",
+        httpOnly: true,
+        maxAge: 7 * 24 * 60 * 60 * 1000
+    });
 
     res.status(200).json({
         message:"User registered successfully",
@@ -114,10 +120,16 @@ const token = jwt.sign({id:user._id },
     config.jwt_secret,{expiresIn:"7d"}
 )
 
-res.cookie("token",token)
+    const isDev = config.NODE_ENV.startsWith("dev");
+    res.cookie("token", token, {
+        secure: !isDev,
+        sameSite: !isDev ? "none" : "lax",
+        httpOnly: true,
+        maxAge: 7 * 24 * 60 * 60 * 1000
+    });
 
 
-    res.redirect("http://localhost:5173/");
+    res.redirect(config.frontend_url);
 }
 
 export const getMe = async (req , res)=>{
@@ -136,7 +148,12 @@ export const getMe = async (req , res)=>{
 }
 
 export const logout = async (req, res) => {
-    res.clearCookie("token");
+    const isDev = config.NODE_ENV.startsWith("dev");
+    res.clearCookie("token", {
+        secure: !isDev,
+        sameSite: !isDev ? "none" : "lax",
+        httpOnly: true
+    });
     res.status(200).json({
         message: "User logged out successfully",
         success: true
