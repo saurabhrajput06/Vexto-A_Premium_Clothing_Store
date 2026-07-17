@@ -129,7 +129,7 @@ const Navbar = () => {
         {/* Logo */}
         <span
           onClick={() => navigate("/")}
-          className={`absolute left-1/2 -translate-x-1/2 font-serif font-bold text-2xl tracking-[0.15em] cursor-pointer uppercase transition-colors ${logoClass}`}
+          className={`absolute left-6 translate-x-0 sm:left-1/2 sm:-translate-x-1/2 font-serif font-bold text-2xl tracking-[0.15em] cursor-pointer uppercase transition-colors ${logoClass}`}
         >
           VEXTO
         </span>
