@@ -8,7 +8,7 @@ const authApiInstance=axios.create({
 
 
 
-export async function register({email , fullname , contact , password,isSeller}){
+export async function register({email , fullname ,contact , password,isSeller}){
     try{
         const response=await authApiInstance.post("/register",{
             email ,
