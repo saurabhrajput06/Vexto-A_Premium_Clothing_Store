@@ -1,0 +1,11 @@
+# Blueprint spec for Render deployments
+# Reference: https://render.com/docs/blueprints
+services:
+  - type: web
+    name: vexto-frontend
+    env: static
+    staticPublishPath: Frontend/dist
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
