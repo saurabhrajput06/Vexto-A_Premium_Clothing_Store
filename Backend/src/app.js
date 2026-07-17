@@ -20,8 +20,9 @@ const app = express();
 
 
 app.use(cors({
-  origin: "https://vexto-frontend.onrender.com", 
-  credentials: true 
+  origin: [config.frontend_url, "http://localhost:5173"],
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+  credentials: true
 }));
 
 
