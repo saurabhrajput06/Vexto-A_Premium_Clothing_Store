@@ -61,38 +61,21 @@ cd Vexto-A_Premium_Clothing_Store
 
 
 
-2. Backend Setup
-Navigate to the backend directory:
+2. Backend Setup  
+Navigate to the backend directory:  
 
 Bash
-cd backend
-Install dependencies:
-
-Bash
-npm install
-Create a .env file in the backend root and configure your environment variables:
-
-Code snippet
-PORT=5000
-MONGO_URI=your_mongodb_connection_string
-JWT_SECRET=your_jwt_secret_key
-NODE_ENV=development
-FRONTEND_URL=http://localhost:5173
-Start the development server:
-
-Bash
-npm run dev
-3. Frontend Setup
-Open a new terminal and navigate to the frontend directory:
-
-Bash
-cd frontend
-Install dependencies:
+cd Backend
+Install dependencies:  
 
 Bash
 npm install
-Start the Vite development environment:
+3. Frontend Setup  
+Open a new terminal and navigate to the frontend directory:  
 
 Bash
-npm run dev
-Open your browser and navigate to http://localhost:5173.
+cd Frontend
+Install dependencies:  
+
+Bash
+npm install
