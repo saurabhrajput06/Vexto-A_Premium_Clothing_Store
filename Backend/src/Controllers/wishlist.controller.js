@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import WishlistModel from "../Models/wishlist.model.js";
+import WishlistModel from "../Models/Wishlist.model.js";
 import productModel from "../Models/product.model.js";
 
 export const toggleWishlist = async (req, res) => {
