@@ -1,131 +1,177 @@
 import React, { useState } from "react";
-import { useDispatch } from "react-redux";
-import { addAddress } from "../state/addressSlice";
 
-const AddressForm = ({ onClose, onSubmit }) => {
-  const dispatch = useDispatch();
-  const [formData, setFormData] = useState({
-    name: "",
-    mobile: "",
-    houseName: "",
-    area: "",
-    city: "",
-    state: "",
-    country: "India",
-    pincode: "",
-    addressType: "home",
-  });
+const AddressForm = ({ initialData = null, onSubmit, onClose }) => {
+  const [formData, setFormData] = useState(
+    initialData || {
+      name: "",
+      mobile: "",
+      houseName: "",
+      area: "",
+      city: "",
+      state: "",
+      country: "India", // Default India set rahega
+      pincode: "",
+      addressType: "home",
+    }
+  );
+  const [submitting, setSubmitting] = useState(false);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async (e) => {
+  const handleFormSubmit = async (e) => {
     e.preventDefault();
-    if (onSubmit) {
+    setSubmitting(true);
+    try {
       await onSubmit(formData);
-    } else {
-      dispatch(addAddress(formData));
       if (onClose) onClose();
+    } catch (err) {
+      alert("Something went wrong while saving address.");
+    } finally {
+      setSubmitting(false);
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="p-4 bg-white rounded-lg shadow-md max-w-lg mx-auto">
-      <h2 className="text-xl font-bold mb-4">Add New Address</h2>
-
-      <div className="grid grid-cols-2 gap-3 mb-3">
-        <input
-          name="name"
-          placeholder="Full Name"
-          value={formData.name}
-          onChange={handleChange}
-          required
-          className="border p-2 rounded w-full"
-        />
-        <input
-          name="mobile"
-          placeholder="10-digit Mobile"
-          value={formData.mobile}
-          onChange={handleChange}
-          required
-          className="border p-2 rounded w-full"
-        />
-      </div>
-
-      <div className="mb-3">
-        <input
-          name="houseName"
-          placeholder="Flat / House No / Building"
-          value={formData.houseName}
-          onChange={handleChange}
-          required
-          className="border p-2 rounded w-full"
-        />
-      </div>
-
-      <div className="mb-3">
-        <input
-          name="area"
-          placeholder="Area / Street / Sector"
-          value={formData.area}
-          onChange={handleChange}
-          required
-          className="border p-2 rounded w-full"
-        />
-      </div>
-
-      <div className="grid grid-cols-2 gap-3 mb-3">
-        <input
-          name="city"
-          placeholder="City"
-          value={formData.city}
-          onChange={handleChange}
-          required
-          className="border p-2 rounded w-full"
-        />
-        <input
-          name="state"
-          placeholder="State"
-          value={formData.state}
-          onChange={handleChange}
-          required
-          className="border p-2 rounded w-full"
-        />
-      </div>
-
-      <div className="grid grid-cols-2 gap-3 mb-4">
-        <input
-          name="pincode"
-          placeholder="Pincode"
-          value={formData.pincode}
-          onChange={handleChange}
-          required
-          className="border p-2 rounded w-full"
-        />
-        <select
-          name="addressType"
-          value={formData.addressType}
-          onChange={handleChange}
-          className="border p-2 rounded w-full"
-        >
-          <option value="home">Home</option>
-          <option value="office">Office</option>
-          <option value="other">Other</option>
-        </select>
-      </div>
-
-      <div className="flex gap-2">
-        <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
-          Save Address
-        </button>
-        {onClose && (
-          <button type="button" onClick={onClose} className="bg-gray-200 px-4 py-2 rounded">
-            Cancel
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
+      <div className="bg-white w-full max-w-lg rounded-2xl p-6 sm:p-8 shadow-2xl relative max-h-[90vh] overflow-y-auto">
+        <div className="flex justify-between items-center pb-4 border-b border-neutral-100">
+          <h3 className="font-serif text-lg font-bold text-neutral-900">
+            {initialData ? "Edit Address" : "Add New Address"}
+          </h3>
+          <button onClick={onClose} className="text-neutral-400 hover:text-neutral-800 text-lg font-bold">
+            ✕
           </button>
-        )}
+        </div>
+
+        <form onSubmit={handleFormSubmit} className="space-y-4 mt-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label className="text-[10px] font-semibold uppercase tracking-wider text-neutral-400 mb-1 block">Full Name</label>
+              <input
+                name="name"
+                required
+                value={formData.name}
+                onChange={handleChange}
+                className="w-full border border-neutral-200 rounded-xl p-3 text-xs focus:outline-none focus:border-neutral-900"
+              />
+            </div>
+            <div>
+              <label className="text-[10px] font-semibold uppercase tracking-wider text-neutral-400 mb-1 block">Mobile Number</label>
+              <input
+                name="mobile"
+                required
+                maxLength={10}
+                value={formData.mobile}
+                onChange={handleChange}
+                className="w-full border border-neutral-200 rounded-xl p-3 text-xs focus:outline-none focus:border-neutral-900"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="text-[10px] font-semibold uppercase tracking-wider text-neutral-400 mb-1 block">Flat / House No / Building</label>
+            <input
+              name="houseName"
+              required
+              value={formData.houseName}
+              onChange={handleChange}
+              className="w-full border border-neutral-200 rounded-xl p-3 text-xs focus:outline-none focus:border-neutral-900"
+            />
+          </div>
+
+          <div>
+            <label className="text-[10px] font-semibold uppercase tracking-wider text-neutral-400 mb-1 block">Area / Street / Sector</label>
+            <input
+              name="area"
+              required
+              value={formData.area}
+              onChange={handleChange}
+              className="w-full border border-neutral-200 rounded-xl p-3 text-xs focus:outline-none focus:border-neutral-900"
+            />
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label className="text-[10px] font-semibold uppercase tracking-wider text-neutral-400 mb-1 block">City</label>
+              <input
+                name="city"
+                required
+                value={formData.city}
+                onChange={handleChange}
+                className="w-full border border-neutral-200 rounded-xl p-3 text-xs focus:outline-none focus:border-neutral-900"
+              />
+            </div>
+            <div>
+              <label className="text-[10px] font-semibold uppercase tracking-wider text-neutral-400 mb-1 block">State</label>
+              <input
+                name="state"
+                required
+                value={formData.state}
+                onChange={handleChange}
+                className="w-full border border-neutral-200 rounded-xl p-3 text-xs focus:outline-none focus:border-neutral-900"
+              />
+            </div>
+          </div>
+
+          {/* Country aur Pincode field */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label className="text-[10px] font-semibold uppercase tracking-wider text-neutral-400 mb-1 block">Country</label>
+              <input
+                name="country"
+                required
+                value={formData.country}
+                onChange={handleChange}
+                className="w-full border border-neutral-200 rounded-xl p-3 text-xs focus:outline-none focus:border-neutral-900"
+              />
+            </div>
+            <div>
+              <label className="text-[10px] font-semibold uppercase tracking-wider text-neutral-400 mb-1 block">Pincode</label>
+              <input
+                name="pincode"
+                required
+                value={formData.pincode}
+                onChange={handleChange}
+                className="w-full border border-neutral-200 rounded-xl p-3 text-xs focus:outline-none focus:border-neutral-900"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="text-[10px] font-semibold uppercase tracking-wider text-neutral-400 mb-1 block">Address Type</label>
+            <select
+              name="addressType"
+              value={formData.addressType}
+              onChange={handleChange}
+              className="w-full border border-neutral-200 rounded-xl p-3 text-xs capitalize focus:outline-none focus:border-neutral-900"
+            >
+              <option value="home">Home</option>
+              <option value="office">Office</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+
+          <div className="flex gap-3 pt-3">
+            <button
+              type="submit"
+              disabled={submitting}
+              className="flex-1 bg-neutral-900 text-white py-3.5 rounded-xl text-xs font-semibold uppercase tracking-wider hover:bg-neutral-800 disabled:opacity-50"
+            >
+              {submitting ? "Saving..." : "Save Address"}
+            </button>
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-6 py-3.5 border border-neutral-200 text-neutral-700 rounded-xl text-xs font-semibold uppercase tracking-wider hover:bg-neutral-50"
+            >
+              Cancel
+            </button>
+          </div>
+        </form>
       </div>
-    </form>
+    </div>
   );
 };
 
