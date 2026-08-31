@@ -1,19 +1,14 @@
-import React, { useEffect, useState } from 'react'
-import { useSelector } from 'react-redux'
-import { useCart } from '../Hook/useCart'
-import { useNavigate } from 'react-router'
-import Footer from '../../shared/Footer'
-import Navbar from '../../shared/Navbar'
+import React, { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
+import { useCart } from "../Hook/useCart";
+import { useAddress } from "../../Address/Hook/useAddress";
+import AddressForm from "../../Address/pages/AddressForm.jsx";
+import { useNavigate } from "react-router";
+import Footer from "../../shared/Footer";
+import Navbar from "../../shared/Navbar";
 import { useRazorpay } from "react-razorpay";
 
-
-
 /* ── Icons ── */
-const BackIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-    <path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-  </svg>
-);
 const TrashIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
     <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -65,6 +60,12 @@ const LockIcon = () => (
     <path d="M7 11V7a5 5 0 0110 0v4" />
   </svg>
 );
+const LocationPinIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+    <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+    <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+  </svg>
+);
 
 /* ── Helpers ── */
 const formatPrice = (amount, currency = "INR") => {
@@ -79,9 +80,8 @@ const formatPrice = (amount, currency = "INR") => {
 const getVariantData = (item) => {
   if (!item.variant || !item.product?.variants) return null;
   if (Array.isArray(item.product.variants)) {
-    return item.product.variants.find(v => v._id === item.variant);
+    return item.product.variants.find((v) => v._id === item.variant);
   }
-  // When using aggregation pipeline, variants might already be an unwound object
   if (item.product.variants._id === item.variant) {
     return item.product.variants;
   }
@@ -108,15 +108,13 @@ const getItemCurrency = (item) => {
 const getVariantLabel = (item) => {
   const variant = getVariantData(item);
   if (!variant?.attributes || Object.keys(variant.attributes).length === 0) return null;
-  return Object.values(variant.attributes)
-    .join(" · ");
+  return Object.values(variant.attributes).join(" · ");
 };
 
 const getVariantStock = (item) => {
   const variant = getVariantData(item);
   return variant?.stock;
 };
-
 
 /* ── Cart Item Component ── */
 const CartItem = ({ item, onRemove, onUpdateQuantity, removingId }) => {
@@ -132,19 +130,24 @@ const CartItem = ({ item, onRemove, onUpdateQuantity, removingId }) => {
   const lineTotal = price * item.quantity;
   const isRemoving = removingId === item._id;
 
-  const prev = (e) => { e.stopPropagation(); setImgIdx(i => (i === 0 ? images.length - 1 : i - 1)); };
-  const next = (e) => { e.stopPropagation(); setImgIdx(i => (i === images.length - 1 ? 0 : i + 1)); };
+  const prev = (e) => {
+    e.stopPropagation();
+    setImgIdx((i) => (i === 0 ? images.length - 1 : i - 1));
+  };
+  const next = (e) => {
+    e.stopPropagation();
+    setImgIdx((i) => (i === images.length - 1 ? 0 : i + 1));
+  };
 
-
-  // console.log(item)
   return (
     <div
-      className={`group transition-all duration-500 ease-[cubic-bezier(0.25,1,0.5,1)] p-4 sm:p-5 rounded-2xl border border-transparent hover:border-neutral-100 hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.05)] hover:bg-neutral-50/50 hover:-translate-y-1 ${isRemoving ? 'opacity-0 scale-95 max-h-0 -mb-6' : 'opacity-100 scale-100 max-h-[300px]'}`}
+      className={`group transition-all duration-500 ease-[cubic-bezier(0.25,1,0.5,1)] p-4 sm:p-5 rounded-2xl border border-transparent hover:border-neutral-100 hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.05)] hover:bg-neutral-50/50 hover:-translate-y-1 ${
+        isRemoving ? "opacity-0 scale-95 max-h-0 -mb-6" : "opacity-100 scale-100 max-h-[300px]"
+      }`}
     >
       <div className="flex flex-col sm:flex-row sm:items-center gap-5 w-full">
         {/* Product Area */}
         <div className="flex-1 flex gap-5 sm:gap-7 min-w-0">
-          {/* Image */}
           <div
             className="relative w-[100px] h-[130px] sm:w-[130px] sm:h-[165px] bg-neutral-100 rounded-xl overflow-hidden shrink-0 shadow-sm"
             onMouseEnter={() => setHovered(true)}
@@ -162,9 +165,8 @@ const CartItem = ({ item, onRemove, onUpdateQuantity, removingId }) => {
               </div>
             )}
 
-            {/* Mini carousel arrows */}
             {hasMultiple && (
-              <div className={`absolute inset-0 flex items-center justify-between px-1 transition-opacity duration-300 ${hovered ? 'opacity-100' : 'opacity-0'}`}>
+              <div className={`absolute inset-0 flex items-center justify-between px-1 transition-opacity duration-300 ${hovered ? "opacity-100" : "opacity-0"}`}>
                 <button onClick={prev} className="p-1 bg-white/80 hover:bg-white text-neutral-800 rounded-full backdrop-blur-sm transition-colors shadow-sm">
                   <ChevronLeftIcon />
                 </button>
@@ -174,20 +176,18 @@ const CartItem = ({ item, onRemove, onUpdateQuantity, removingId }) => {
               </div>
             )}
 
-            {/* Image dots */}
             {hasMultiple && (
               <div className="absolute bottom-1.5 left-0 right-0 flex justify-center gap-1">
                 {images.map((_, i) => (
                   <span
                     key={i}
-                    className={`block w-1 h-1 rounded-full transition-all ${i === imgIdx ? 'bg-white w-2.5' : 'bg-white/40'}`}
+                    className={`block w-1 h-1 rounded-full transition-all ${i === imgIdx ? "bg-white w-2.5" : "bg-white/40"}`}
                   />
                 ))}
               </div>
             )}
           </div>
 
-          {/* Info */}
           <div className="flex-1 flex flex-col justify-between py-0.5 min-w-0">
             <div>
               <div className="flex items-start justify-between gap-2">
@@ -229,7 +229,6 @@ const CartItem = ({ item, onRemove, onUpdateQuantity, removingId }) => {
               </div>
             </div>
 
-            {/* Desktop Remove Button */}
             <button
               onClick={() => onRemove(item._id)}
               className="hidden sm:flex items-center gap-1.5 w-fit mt-auto pt-3 text-[10px] font-bold uppercase tracking-widest text-neutral-400 hover:text-red-500 transition-colors"
@@ -240,7 +239,7 @@ const CartItem = ({ item, onRemove, onUpdateQuantity, removingId }) => {
           </div>
         </div>
 
-        {/* Quantity + Line Total */}
+        {/* Quantity & Total */}
         <div className="flex items-center justify-between sm:justify-start w-full sm:w-auto mt-1 sm:mt-0">
           <div className="sm:w-28 flex sm:justify-center shrink-0">
             <div className="flex items-center gap-0 border border-neutral-200 rounded-lg overflow-hidden bg-white">
@@ -275,9 +274,6 @@ const CartItem = ({ item, onRemove, onUpdateQuantity, removingId }) => {
   );
 };
 
-
-
-
 /* ── Empty Cart ── */
 const EmptyCart = ({ navigate }) => (
   <div className="flex flex-col items-center justify-center py-24 sm:py-36">
@@ -297,65 +293,98 @@ const EmptyCart = ({ navigate }) => (
   </div>
 );
 
-
-/* ── Order Summary ── */
-const OrderSummary = ({ items, navigate }) => {
-  const subtotal = items.reduce((sum, item) => {
-    return sum + getItemPrice(item) * item.quantity;
-  }, 0);
-
+/* ── Order Summary With Address Integration ── */
+const OrderSummary = ({ items, navigate, selectedAddress, onOpenAddressModal }) => {
+  const subtotal = items.reduce((sum, item) => sum + getItemPrice(item) * item.quantity, 0);
   const currency = items.length > 0 ? getItemCurrency(items[0]) : "INR";
   const shipping = subtotal > 999 ? 0 : 99;
   const total = subtotal + shipping;
   const itemCount = items.reduce((sum, item) => sum + item.quantity, 0);
   const shippingProgress = Math.min(100, (subtotal / 1000) * 100);
 
-
   const { handlePayment, handleVerifyPaymentOrder } = useCart();
   const { Razorpay } = useRazorpay();
   const user = useSelector((state) => state.auth.user);
 
   async function handleCheckout() {
-    const order = await handlePayment();
-    console.log("order is", order);
+    if (!selectedAddress) {
+      alert("Please select or add a delivery address first.");
+      onOpenAddressModal();
+      return;
+    }
+
+    // Passing addressId along with payment initiation
+    const order = await handlePayment({ addressId: selectedAddress._id });
+    if (!order) return;
 
     const options = {
       key: "rzp_test_SzmMgjTVFCeVog",
-      amount: order.amount, // Amount in paise
+      amount: order.amount,
       currency: order.currency,
       name: "Vexto - Premium Collection",
-      description: "Payment",
-      order_id: order.id, //Generate order_id on server
+      description: "Payment for Order",
+      order_id: order.id,
       handler: async (response) => {
-        const isValid = await handleVerifyPaymentOrder(response)
+        const isValid = await handleVerifyPaymentOrder(response);
         if (isValid) {
-          navigate(`/order-sucess?order_id=${response?.razorpay_order_id || response?.razorpayOrderId}&payment_id=${response?.razorpay_payment_id || response?.razorpayPaymentId}`, { state: { order, items } })
+          navigate(
+            `/order-sucess?order_id=${response?.razorpay_order_id || response?.razorpayOrderId}&payment_id=${response?.razorpay_payment_id || response?.razorpayPaymentId}`,
+            { state: { order, items, address: selectedAddress } }
+          );
+        } else {
+          alert("Payment verification failed");
         }
-        else {
-          alert("Payment verification failed")
-        }
-
       },
       prefill: {
-        name: user?.fullname,
+        name: selectedAddress?.name || user?.fullname,
         email: user?.email,
-        contact: user?.contact,
+        contact: selectedAddress?.mobile || user?.contact,
       },
       theme: {
-        color: "#1e293b",
+        color: "#171717",
       },
     };
 
     const razorpayInstance = new Razorpay(options);
     razorpayInstance.open();
-
-    // navigate("/checkout", { state: { order } })
   }
+
   return (
     <div className="lg:sticky lg:top-24">
-      {/* Summary Card */}
-      <div className="bg-neutral-50/80 backdrop-blur-md border border-transparent hover:border-neutral-900 rounded-2xl p-6 sm:p-8 transition-all duration-500 ease-out hover:shadow-[0_30px_60px_-15px_rgba(0,0,0,0.1)] hover:-translate-y-1">
-        <h2 className="text-[11px] font-semibold uppercase tracking-[0.25em] text-neutral-400 mb-8">
+      <div className="bg-neutral-50/80 backdrop-blur-md border border-neutral-100 hover:border-neutral-900 rounded-2xl p-6 sm:p-8 transition-all duration-500 ease-out hover:shadow-[0_30px_60px_-15px_rgba(0,0,0,0.1)] hover:-translate-y-1">
+        
+        {/* 🚚 Delivery Address Snippet */}
+        <div className="mb-6 bg-white p-4 rounded-xl border border-neutral-200/80 shadow-sm">
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-1.5 text-neutral-900 font-semibold text-xs uppercase tracking-wider">
+              <LocationPinIcon />
+              <span>Deliver To</span>
+            </div>
+            <button
+              onClick={onOpenAddressModal}
+              className="text-[11px] font-bold text-neutral-900 hover:text-neutral-600 underline tracking-wider uppercase"
+            >
+              {selectedAddress ? "Change" : "Add Address"}
+            </button>
+          </div>
+
+          {selectedAddress ? (
+            <div className="text-xs text-neutral-600 space-y-0.5">
+              <p className="font-semibold text-neutral-900">
+                {selectedAddress.name} <span className="text-[10px] bg-neutral-100 text-neutral-600 px-1.5 py-0.5 rounded capitalize ml-1">{selectedAddress.addressType}</span>
+              </p>
+              <p className="truncate">{selectedAddress.houseName}, {selectedAddress.area}</p>
+              <p>{selectedAddress.city}, {selectedAddress.state} - {selectedAddress.pincode}</p>
+              <p className="text-[11px] text-neutral-500 pt-1 font-medium">Phone: {selectedAddress.mobile}</p>
+            </div>
+          ) : (
+            <p className="text-xs text-amber-600 font-medium">
+              No delivery address selected. Please click above to add or choose one.
+            </p>
+          )}
+        </div>
+
+        <h2 className="text-[11px] font-semibold uppercase tracking-[0.25em] text-neutral-400 mb-6">
           Order Summary
         </h2>
 
@@ -433,35 +462,119 @@ const OrderSummary = ({ items, navigate }) => {
   );
 };
 
+/* ── Address Selection & Quick Add Modal for Cart ── */
+const AddressModal = ({ isOpen, onClose, addresses, selectedAddress, onSelectAddress, onAddNewAddress }) => {
+  const [showAddForm, setShowAddForm] = useState(false);
+
+  if (!isOpen) return null;
+
+  return (
+    <>
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
+        <div className="bg-white w-full max-w-md rounded-2xl p-6 shadow-2xl relative max-h-[85vh] flex flex-col">
+          <div className="flex justify-between items-center pb-4 border-b border-neutral-100">
+            <h3 className="font-serif text-lg font-bold text-neutral-900">Select Delivery Address</h3>
+            <button onClick={onClose} className="text-neutral-400 hover:text-neutral-800 text-lg font-bold">
+              ✕
+            </button>
+          </div>
+
+          <div className="overflow-y-auto py-4 space-y-3 flex-1">
+            {addresses.length === 0 ? (
+              <div className="text-center py-6 text-sm text-neutral-500">
+                No saved addresses found. Please add a new address.
+              </div>
+            ) : (
+              addresses.map((addr) => (
+                <div
+                  key={addr._id}
+                  onClick={() => {
+                    onSelectAddress(addr);
+                    onClose();
+                  }}
+                  className={`p-3.5 border rounded-xl cursor-pointer transition-all ${
+                    selectedAddress?._id === addr._id
+                      ? "border-neutral-900 bg-neutral-50 ring-1 ring-neutral-900"
+                      : "border-neutral-200 hover:border-neutral-400"
+                  }`}
+                >
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="font-semibold text-xs uppercase tracking-wider text-neutral-900">{addr.name}</span>
+                    <span className="text-[10px] bg-neutral-100 text-neutral-600 px-2 py-0.5 rounded capitalize">
+                      {addr.addressType}
+                    </span>
+                  </div>
+                  <p className="text-xs text-neutral-600 leading-relaxed">{addr.houseName}, {addr.area}</p>
+                  <p className="text-xs text-neutral-600">{addr.city}, {addr.state} - {addr.pincode}</p>
+                  <p className="text-[11px] text-neutral-400 mt-1">Mobile: {addr.mobile}</p>
+                </div>
+              ))
+            )}
+          </div>
+
+          <div className="pt-4 border-t border-neutral-100">
+            <button
+              onClick={() => setShowAddForm(true)}
+              className="w-full py-3.5 bg-neutral-900 text-white rounded-xl text-xs font-semibold uppercase tracking-wider hover:bg-neutral-800 transition-colors"
+            >
+              + Add New Address
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {showAddForm && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+          <div className="bg-white w-full max-w-lg rounded-2xl p-6 shadow-2xl relative max-h-[90vh] overflow-y-auto">
+            <AddressForm
+              onSubmit={async (formData) => {
+                await onAddNewAddress(formData);
+                setShowAddForm(false);
+              }}
+              onClose={() => setShowAddForm(false)}
+            />
+          </div>
+        </div>
+      )}
+    </>
+  );
+};
 
 /* ── Main Cart Page ── */
 const Cart = () => {
-  const cartItems = useSelector(state => state.cart.items)
-  const cartLoading = useSelector(state => state.cart.loading)
-  const navigate = useNavigate()
-  const { handleGetCart, handleRemoveItem, handleUpdateQuantity } = useCart()
-  const [removingId, setRemovingId] = useState(null)
+  const cartItems = useSelector((state) => state.cart.items);
+  const cartLoading = useSelector((state) => state.cart.loading);
+  const navigate = useNavigate();
+  const { handleGetCart, handleRemoveItem, handleUpdateQuantity } = useCart();
+  const { addresses, defaultAddress, createAddress } = useAddress(true);
 
+  const [removingId, setRemovingId] = useState(null);
+  const [selectedAddress, setSelectedAddress] = useState(null);
+  const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
 
   useEffect(() => {
-    handleGetCart()
-  }, [])
+    handleGetCart();
+  }, []);
+
+  // Set initial selected address to default address once loaded
+  useEffect(() => {
+    if (!selectedAddress && (defaultAddress || addresses.length > 0)) {
+      setSelectedAddress(defaultAddress || addresses[0]);
+    }
+  }, [defaultAddress, addresses, selectedAddress]);
 
   const onRemove = async (itemId) => {
-    setRemovingId(itemId)
+    setRemovingId(itemId);
     setTimeout(async () => {
-      await handleRemoveItem(itemId)
-      setRemovingId(null)
-    }, 450)
-  }
+      await handleRemoveItem(itemId);
+      setRemovingId(null);
+    }, 450);
+  };
 
   const onUpdateQuantity = (itemId, quantity) => {
-    handleUpdateQuantity(itemId, quantity)
-  }
+    handleUpdateQuantity(itemId, quantity);
+  };
 
-
-
-  // Loading state
   if (cartLoading && (!cartItems || cartItems.length === 0)) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
@@ -477,12 +590,9 @@ const Cart = () => {
 
   return (
     <div className="min-h-screen bg-white font-sans text-neutral-900 selection:bg-neutral-200">
-
-      {/* Navbar */}
       <Navbar />
 
       <div className="max-w-7xl mx-auto px-6 sm:px-10 pt-12 pb-24">
-
         {/* Page Header */}
         <div className="mb-10 sm:mb-14 flex flex-col sm:flex-row sm:items-baseline justify-between gap-4 border-b border-neutral-100 pb-6">
           <div>
@@ -516,10 +626,8 @@ const Cart = () => {
           <EmptyCart navigate={navigate} />
         ) : (
           <div className="flex flex-col lg:flex-row gap-12 xl:gap-20">
-
             {/* Left: Cart Items */}
             <div className="flex-1 min-w-0">
-              {/* Column Headers - Desktop */}
               <div className="hidden sm:flex items-center text-[9px] font-semibold uppercase tracking-[0.25em] text-neutral-300 pb-4 border-b border-neutral-100 mb-2">
                 <span className="flex-1">Products</span>
                 <span className="w-28 text-center">Quantity</span>
@@ -541,17 +649,39 @@ const Cart = () => {
 
             {/* Right: Order Summary */}
             <div className="w-full lg:w-[360px] xl:w-[380px] shrink-0">
-              <OrderSummary items={cartItems} navigate={navigate} />
+              <OrderSummary
+                items={cartItems}
+                navigate={navigate}
+                selectedAddress={selectedAddress}
+                onOpenAddressModal={() => setIsAddressModalOpen(true)}
+              />
             </div>
-
           </div>
         )}
       </div>
 
-      {/* Footer */}
+      {/* Address Selection Modal */}
+      <AddressModal
+        isOpen={isAddressModalOpen}
+        onClose={() => setIsAddressModalOpen(false)}
+        addresses={addresses}
+        selectedAddress={selectedAddress}
+        onSelectAddress={(addr) => setSelectedAddress(addr)}
+        onAddNewAddress={async (formData) => {
+          try {
+            const newAddr = await createAddress(formData);
+            if (newAddr) {
+              setSelectedAddress(newAddr);
+            }
+          } catch (err) {
+            console.error("Failed to add address:", err);
+          }
+        }}
+      />
+
       <Footer />
     </div>
-  )
-}
+  );
+};
 
-export default Cart
+export default Cart;

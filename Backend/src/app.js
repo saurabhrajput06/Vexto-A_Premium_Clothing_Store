@@ -7,6 +7,7 @@ import cartRoutes from "./Routes/cart.route.js";
 import cors from "cors";
 import wishlistRoutes from "./Routes/wishlist.route.js";
 import {config} from "./config/config.js";
+import addressRoutes from "./Routes/address.route.js";
 
 
 //GoogleAuthentication
@@ -59,10 +60,20 @@ app.use("/api/cart", (req, res, next) => {
 }, cartRoutes);
 // app.use("/api/cart",cartRoutes);
 
+
+//Wishlist routes
 app.use("/api/wishlist",(req,res,next)=>{
     console.log("Wishlist Route Hit! Path:",req.path);
     next();
 },wishlistRoutes);
+
+
+
+
+//Address routes
+app.use("/api/address", (req, res, next) => {
+    next();
+}, addressRoutes);
 
 
 

@@ -4,6 +4,8 @@ import { useNavigate } from 'react-router';
 import { useAuth } from '../../Auth/Hook/UseAuth';
 import Navbar from '../../shared/Navbar';
 import Footer from '../../shared/Footer';
+import { useAddress } from '../../Address/Hook/useAddress';
+import AddressForm from '../../Address/pages/AddressForm'; 
 
 /* ── Icons ── */
 const UserIcon = () => (
@@ -261,75 +263,154 @@ const WishlistTab = ({ navigate }) => (
 /* ── Address Tab ── */
 const AddressTab = () => {
   const [showForm, setShowForm] = useState(false);
-  const DUMMY_ADDRESSES = [
-    {
-      id: 1,
-      label: 'Home',
-      address: '42, Sunrise Apartments, Sector 18',
-      city: 'Noida',
-      state: 'Uttar Pradesh',
-      pin: '201301',
-      default: true,
-    },
-  ];
+  const [editingAddress, setEditingAddress] = useState(null);
+
+  // 1. DUMMY_ADDRESSES array hata kar hook se actual data lein
+  const { 
+    addresses, 
+    loading, 
+    removeAddress, 
+    setDefault, 
+    createAddress, 
+    modifyAddress 
+  } = useAddress(true); // true se automatically API se fetch ho jayega
+
+  // Form submit handler (Add / Edit dono ke liye)
+  const handleSaveAddress = async (formData) => {
+    try {
+      if (editingAddress) {
+        await modifyAddress(editingAddress._id, formData);
+      } else {
+        await createAddress(formData);
+      }
+      setShowForm(false);
+      setEditingAddress(null);
+    } catch (error) {
+      alert("Failed to save address");
+    }
+  };
+
+  const handleEdit = (addr) => {
+    setEditingAddress(addr);
+    setShowForm(true);
+  };
+
+  const handleDelete = async (id) => {
+    if (window.confirm("Are you sure you want to delete this address?")) {
+      await removeAddress(id);
+    }
+  };
+
+  if (loading && (!addresses || addresses.length === 0)) {
+    return <div className="p-8 text-sm text-neutral-400">Loading addresses...</div>;
+  }
 
   return (
-    <div className="space-y-5">
-      <div className="flex items-center justify-between mb-6">
-        <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-neutral-400">Saved Addresses</p>
+    <div className="space-y-6">
+      {/* Top Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-neutral-400">
+            Addresses
+          </p>
+          <h2 className="text-lg font-serif text-neutral-900 mt-1">Saved Addresses</h2>
+        </div>
         <button
-          onClick={() => setShowForm(!showForm)}
-          className="text-[11px] font-semibold uppercase tracking-widest text-neutral-900 border border-neutral-300 hover:border-neutral-900 px-3.5 py-2 rounded-lg transition-all hover:bg-neutral-900 hover:text-white"
+          onClick={() => {
+            setEditingAddress(null);
+            setShowForm(true);
+          }}
+          className="px-4 py-2 border border-neutral-900 text-neutral-900 rounded-lg text-xs font-semibold uppercase tracking-wider hover:bg-neutral-900 hover:text-white transition-colors"
         >
           + Add New
         </button>
       </div>
 
-      {DUMMY_ADDRESSES.map(addr => (
-        <div key={addr.id} className="p-5 rounded-2xl border border-neutral-200 hover:border-neutral-900 transition-all duration-300 group relative">
-          <div className="flex items-start justify-between">
-            <div>
-              <div className="flex items-center gap-2 mb-2">
-                <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-neutral-500">{addr.label}</span>
-                {addr.default && (
-                  <span className="text-[9px] font-bold uppercase tracking-widest bg-neutral-900 text-white px-2 py-0.5 rounded-full">Default</span>
-                )}
-              </div>
-              <p className="text-sm text-neutral-800 leading-relaxed">
-                {addr.address}<br />
-                {addr.city}, {addr.state} – {addr.pin}
-              </p>
-            </div>
-            <button className="text-[11px] font-semibold text-neutral-400 hover:text-neutral-900 uppercase tracking-widest transition-colors flex items-center gap-1">
-              <EditIcon /> Edit
+      {/* Add / Edit Form Modal */}
+      {showForm && (
+        <AddressForm
+          initialData={editingAddress}
+          onSubmit={handleSaveAddress}
+          onClose={() => {
+            setShowForm(false);
+            setEditingAddress(null);
+          }}
+        />
+      )}
+
+      {/* Address Cards List */}
+      <div className="space-y-4">
+        {addresses.length === 0 ? (
+          <div className="p-8 border border-dashed border-neutral-200 rounded-xl text-center">
+            <p className="text-sm text-neutral-400 mb-3">No addresses saved yet.</p>
+            <button
+              onClick={() => {
+                setEditingAddress(null);
+                setShowForm(true);
+              }}
+              className="text-xs font-bold text-neutral-900 underline uppercase tracking-wider"
+            >
+              Add your first address
             </button>
           </div>
-        </div>
-      ))}
-
-      {showForm && (
-        <div className="p-5 rounded-2xl border border-dashed border-neutral-300 bg-neutral-50/50 space-y-4 mt-4">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-neutral-400 mb-4">New Address</p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {['Address Line', 'City', 'State', 'PIN Code'].map(f => (
-              <div key={f}>
-                <label className="block text-[10px] uppercase tracking-widest text-neutral-400 mb-1.5">{f}</label>
-                <input
-                  type="text"
-                  className="w-full bg-white border border-neutral-200 focus:border-neutral-900 text-sm text-neutral-800 px-4 py-2.5 rounded-lg outline-none transition-colors"
-                  placeholder={f}
-                />
+        ) : (
+          addresses.map((addr) => (
+            <div
+              key={addr._id}
+              className={`p-5 rounded-xl border transition-all flex flex-col sm:flex-row justify-between items-start gap-4 ${
+                addr.isDefault
+                  ? "border-neutral-900 bg-neutral-50/40 ring-1 ring-neutral-900"
+                  : "border-neutral-200 hover:border-neutral-400"
+              }`}
+            >
+              <div>
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-[10px] font-bold uppercase tracking-wider bg-neutral-100 text-neutral-800 px-2 py-0.5 rounded">
+                    {addr.addressType || "Home"}
+                  </span>
+                  {addr.isDefault && (
+                    <span className="text-[10px] font-bold uppercase tracking-wider bg-neutral-900 text-white px-2 py-0.5 rounded">
+                      Default
+                    </span>
+                  )}
+                </div>
+                <p className="font-semibold text-neutral-900 text-sm">{addr.name}</p>
+                <p className="text-xs text-neutral-600 leading-relaxed mt-0.5">
+                  {addr.houseName}, {addr.area}
+                </p>
+                <p className="text-xs text-neutral-600">
+                  {addr.city}, {addr.state} – {addr.pincode}
+                </p>
+                <p className="text-xs text-neutral-500 mt-1.5 font-medium">Mobile: {addr.mobile}</p>
               </div>
-            ))}
-          </div>
-          <button
-            onClick={() => setShowForm(false)}
-            className="bg-neutral-900 text-white text-xs font-semibold uppercase tracking-[0.2em] px-8 py-3 rounded-xl hover:-translate-y-0.5 transition-all mt-2"
-          >
-            Save Address
-          </button>
-        </div>
-      )}
+
+              {/* Actions */}
+              <div className="flex items-center gap-3 self-end sm:self-start">
+                <button
+                  onClick={() => handleEdit(addr)}
+                  className="text-xs font-medium text-neutral-600 hover:text-neutral-900 uppercase tracking-wider"
+                >
+                  Edit
+                </button>
+                {!addr.isDefault && (
+                  <button
+                    onClick={() => setDefault(addr._id)}
+                    className="text-xs font-medium text-neutral-900 underline uppercase tracking-wider"
+                  >
+                    Set Default
+                  </button>
+                )}
+                <button
+                  onClick={() => handleDelete(addr._id)}
+                  className="text-xs font-medium text-red-500 hover:text-red-700 uppercase tracking-wider"
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
     </div>
   );
 };
