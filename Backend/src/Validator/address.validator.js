@@ -109,11 +109,11 @@ export const updateAddressValidator = [
     .notEmpty()
     .withMessage("State cannot be empty"),
 
-  body("country")
-    .optional()
-    .trim()
-    .notEmpty()
-    .withMessage("Country cannot be empty"),
+//   body("country")
+//     .optional()
+//     .trim()
+//     .notEmpty()
+//     .withMessage("Country cannot be empty"),
 
   body("pincode")
     .optional()

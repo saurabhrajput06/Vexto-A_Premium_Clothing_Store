@@ -24,7 +24,7 @@ export const addAddress = async (req, res) => {
       area,
       city,
       state,
-      country,
+      country: country || "India",
       pincode,
       addressType: addressType || "home",
       isDefault,
