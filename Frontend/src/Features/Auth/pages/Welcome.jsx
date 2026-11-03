@@ -217,7 +217,7 @@ const Welcome = () => {
           fontWeight: 400,
         }}
       >
-        {user ? `Welcome, ${user.name?.split(' ')[0] || user.email?.split('@')[0]}` : 'Vexto'}
+        Vexto
       </div>
 
       {/* ===== TOP RIGHT NAV ===== */}
