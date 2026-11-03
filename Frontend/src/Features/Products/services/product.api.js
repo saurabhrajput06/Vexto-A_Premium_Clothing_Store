@@ -27,9 +27,7 @@ export async function getAllProducts(){
 }
 
 export async function getProductById(id) {
-    console.log("Fetching product with ID:", id);
     const response = await productApi.get(`/${id}`);
-    console.log("Response:", response.data);
     return response.data;
 }
 

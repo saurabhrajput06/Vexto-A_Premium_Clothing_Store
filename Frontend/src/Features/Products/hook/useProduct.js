@@ -1,3 +1,4 @@
+import { useCallback } from "react";
 import { useDispatch } from "react-redux";
 import { createProduct, getSellerProducts,getAllProducts, getProductById, createProductVariant, updateProductVariantStock, addProductReview } from "../services/product.api";
 import { setSellerProducts , setProducts } from "../state/product.slice";
@@ -39,7 +40,7 @@ export const useProduct = () => {
         }
     }
 
-    async function handleGetProductById(id) {
+    const handleGetProductById = useCallback(async (id) => {
         try {
             const data = await getProductById(id)
             return data.product
@@ -47,7 +48,7 @@ export const useProduct = () => {
         catch (error) {
             console.log(error)
         }
-    }
+    }, [])
 
     async function handleCreateProductVariant(productId, formData) {
         try {

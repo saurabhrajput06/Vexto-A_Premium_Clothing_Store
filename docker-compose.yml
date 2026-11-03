@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  backend:
+    build: ./Backend
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+    restart: always
+
+  frontend:
+    build: ./Frontend
+    ports:
+      - "8080:80"
+    environment:
+      - PORT=80
+    restart: always
